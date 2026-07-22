@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
-import { useVet, Vet } from '../../services/vet';
+import { useVet } from '../../hooks/useVet';
+import { Vet } from '../../services/vet';
 
 interface VetDetailScreenProps {
   vetId: string;
