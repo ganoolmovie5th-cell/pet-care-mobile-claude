@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AuthContext } from '../context/AuthContext';
 import { AuthStack } from './AuthStack';
 import { HealthStack } from './HealthStack';
+import { PlaydateStack } from './PlaydateStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -13,11 +14,6 @@ const VetStackPlaceholder = () => (
   </View>
 );
 
-const PlaydateStackPlaceholder = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Playdate Community (TBD)</Text>
-  </View>
-);
 
 const ProfileStackPlaceholder = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -61,11 +57,12 @@ const MainTabs = () => {
       />
       <Tab.Screen
         name="PlaydateTab"
-        component={PlaydateStackPlaceholder}
+        component={PlaydateStack}
         options={{
           title: 'Playdate',
           tabBarLabel: 'Playdate',
           tabBarIcon: () => <Text style={{ fontSize: 20 }}>🎾</Text>,
+          headerShown: false,
         }}
       />
       <Tab.Screen
