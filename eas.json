@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "version": ">= 5.0.0"
+  },
+  "build": {
+    "production": {
+      "channel": "production",
+      "distribution": "store",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "buildType": "archive"
+      }
+    },
+    "preview": {
+      "channel": "preview",
+      "distribution": "internal"
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleTeamId": "YOUR_APPLE_TEAM_ID",
+        "appleId": "your-apple-id@example.com"
+      },
+      "android": {
+        "serviceAccount": "keys/google-play-key.json",
+        "track": "internal"
+      }
+    }
+  }
+}
