@@ -1,5 +1,23 @@
 import axios from 'axios';
 
+export interface Chat {
+  id: string;
+  participants: string[];
+  matchId: string;
+  lastMessage?: string;
+  lastMessageTime?: string;
+  createdAt: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  chatId: string;
+  senderId: string;
+  text: string;
+  timestamp: string;
+  read: boolean;
+}
+
 export interface PlaydatePost {
   id: string;
   ownerId: string;
