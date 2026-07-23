@@ -89,3 +89,27 @@ export const acceptMatch = async (matchId: string): Promise<void> => {
 export const rejectMatch = async (matchId: string): Promise<void> => {
   await axios.post(`${apiBaseUrl}/playdate/matches/${matchId}/reject`);
 };
+
+export const getOrCreateChat = async (matchId: string, otherUserId: string): Promise<Chat> => {
+  const response = await axios.post(`${apiBaseUrl}/chat`, {
+    matchId,
+    otherUserId,
+  });
+  return response.data;
+};
+
+export const sendMessage = async (chatId: string, text: string): Promise<ChatMessage> => {
+  const response = await axios.post(`${apiBaseUrl}/chat/${chatId}/message`, { text });
+  return response.data;
+};
+
+export const getMessages = async (chatId: string, limit: number = 50): Promise<ChatMessage[]> => {
+  const response = await axios.get(`${apiBaseUrl}/chat/${chatId}/messages`, {
+    params: { limit },
+  });
+  return response.data;
+};
+
+export const markMessagesAsRead = async (chatId: string): Promise<void> => {
+  await axios.post(`${apiBaseUrl}/chat/${chatId}/read`);
+};
