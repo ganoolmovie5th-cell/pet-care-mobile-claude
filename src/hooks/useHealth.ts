@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import { createPet, getPetsByOwner, addHealthRecord, getHealthRecordsByPet, getAllHealthRecords, HealthRecord } from '../services/health';
-import { Pet } from '../types/health';
+import { useState, useCallback, useEffect } from 'react';
+import { createPet, getPetsByOwner, addHealthRecord, getHealthRecordsByPet, getAllHealthRecords, HealthRecord, getVaccinationSchedule, getReminderPreferences, getBookingSuggestions, updateReminderPreferences as updateReminderPreferencesAPI } from '../services/health';
+import { Pet, VaccinationSchedule, ReminderPreferences, BookingSuggestion } from '../types/health';
 
 interface UseHealthReturn {
   pets: Pet[];
@@ -102,3 +102,89 @@ export const useHealth = (): UseHealthReturn => {
     getAllRecords,
   };
 };
+
+export function useVaccinationSchedule(petId: string) {
+  const [schedule, setSchedule] = useState<VaccinationSchedule | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getVaccinationSchedule(petId);
+      setSchedule(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch vaccination schedule');
+    } finally {
+      setLoading(false);
+    }
+  }, [petId]);
+
+  useEffect(() => {
+    refetch();
+  }, [petId, refetch]);
+
+  return { schedule, loading, error, refetch };
+}
+
+export function useReminderPreferences() {
+  const [prefs, setPrefs] = useState<ReminderPreferences | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetch = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getReminderPreferences();
+      setPrefs(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch reminder preferences');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updatePrefs = useCallback(async (updates: Partial<ReminderPreferences>) => {
+    try {
+      await updateReminderPreferencesAPI(updates);
+      setPrefs(prev => prev ? { ...prev, ...updates } : null);
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : 'Failed to update reminder preferences';
+      setError(errMsg);
+      throw err;
+    }
+  }, []);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  return { prefs, loading, error, updatePrefs, refetch: fetch };
+}
+
+export function useBookingSuggestions(petId: string) {
+  const [suggestions, setSuggestions] = useState<BookingSuggestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getBookingSuggestions(petId);
+      setSuggestions(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch booking suggestions');
+    } finally {
+      setLoading(false);
+    }
+  }, [petId]);
+
+  useEffect(() => {
+    refetch();
+  }, [petId, refetch]);
+
+  return { suggestions, loading, error, refetch };
+}
