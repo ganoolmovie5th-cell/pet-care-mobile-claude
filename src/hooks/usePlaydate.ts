@@ -1,157 +1,104 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
-  createPost,
-  searchPostsNearby,
-  getInterestedMatches,
-  markInterest,
-  acceptMatch,
-  rejectMatch,
-  PlaydatePost,
-  PlaydateMatch,
+  getAllActivePosts,
+  getPlaydatePost,
+  getPlaydateChat,
+  addMessageToChat,
 } from '../services/playdate';
+import { PlaydatePost, PlaydateChat } from '../types/playdate';
 
-interface UsePlaydateReturn {
-  posts: PlaydatePost[];
-  matches: PlaydateMatch[];
-  loading: boolean;
-  error: string | null;
-  createNewPost: (
-    post: Omit<PlaydatePost, 'id' | 'created_at' | 'interested_owners'>
-  ) => Promise<string | null>;
-  searchNearby: (filters: {
-    city: string;
-    lat?: number;
-    lng?: number;
-    maxDistance?: number;
-  }) => Promise<void>;
-  fetchMatches: (postId: string) => Promise<void>;
-  markInterested: (postId: string, ownerId: string, petId: string) => Promise<string | null>;
-  acceptMatchHandler: (matchId: string) => Promise<boolean>;
-  rejectMatchHandler: (matchId: string) => Promise<boolean>;
-}
-
-export const usePlaydate = (): UsePlaydateReturn => {
+// Task 23: usePlaydatePosts hook
+export const usePlaydatePosts = () => {
   const [posts, setPosts] = useState<PlaydatePost[]>([]);
-  const [matches, setMatches] = useState<PlaydateMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNewPost = useCallback(
-    async (post: Omit<PlaydatePost, 'id' | 'created_at' | 'interested_owners'>): Promise<string | null> => {
-      try {
-        setLoading(true);
-        setError(null);
-        const postId = await createPost(post);
-        return postId;
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Failed to create post';
-        setError(msg);
-        return null;
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  const searchNearby = useCallback(
-    async (filters: {
-      city: string;
-      lat?: number;
-      lng?: number;
-      maxDistance?: number;
-    }): Promise<void> => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await searchPostsNearby(filters);
-        setPosts(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to search posts');
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  const fetchMatches = useCallback(async (postId: string): Promise<void> => {
+  const refetch = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getInterestedMatches(postId);
-      setMatches(data);
+      const data = await getAllActivePosts();
+      setPosts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch matches');
+      setError(err instanceof Error ? err.message : 'Failed to fetch posts');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const markInterested = useCallback(
-    async (postId: string, ownerId: string, petId: string): Promise<string | null> => {
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
+
+  return { posts, loading, error, refetch };
+};
+
+// Task 23: usePlaydatePost hook
+export const usePlaydatePost = (postId: string) => {
+  const [post, setPost] = useState<PlaydatePost | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    if (!postId) return;
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getPlaydatePost(postId);
+      setPost(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch post');
+    } finally {
+      setLoading(false);
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    refetch();
+  }, [postId, refetch]);
+
+  return { post, loading, error, refetch };
+};
+
+// Task 23: usePlaydateChat hook
+export const usePlaydateChat = (chatId: string) => {
+  const [chat, setChat] = useState<PlaydateChat | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const refetch = useCallback(async () => {
+    if (!chatId) return;
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getPlaydateChat(chatId);
+      setChat(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch chat');
+    } finally {
+      setLoading(false);
+    }
+  }, [chatId]);
+
+  const addMessage = useCallback(
+    async (text: string) => {
+      if (!chatId) return false;
       try {
-        setLoading(true);
-        setError(null);
-        const matchId = await markInterest(postId, ownerId, petId);
-        return matchId;
+        await addMessageToChat(chatId, text);
+        // Refetch to get updated messages
+        await refetch();
+        return true;
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Failed to mark interest';
-        setError(msg);
-        return null;
-      } finally {
-        setLoading(false);
+        setError(err instanceof Error ? err.message : 'Failed to send message');
+        return false;
       }
     },
-    []
+    [chatId, refetch]
   );
 
-  const acceptMatchHandler = useCallback(async (matchId: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      setError(null);
-      await acceptMatch(matchId);
-      setMatches(prev =>
-        prev.map(m => (m.id === matchId ? { ...m, status: 'accepted' } : m))
-      );
-      return true;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to accept match';
-      setError(msg);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  useEffect(() => {
+    refetch();
+  }, [chatId, refetch]);
 
-  const rejectMatchHandler = useCallback(async (matchId: string): Promise<boolean> => {
-    try {
-      setLoading(true);
-      setError(null);
-      await rejectMatch(matchId);
-      setMatches(prev =>
-        prev.map(m => (m.id === matchId ? { ...m, status: 'rejected' } : m))
-      );
-      return true;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to reject match';
-      setError(msg);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return {
-    posts,
-    matches,
-    loading,
-    error,
-    createNewPost,
-    searchNearby,
-    fetchMatches,
-    markInterested,
-    acceptMatchHandler,
-    rejectMatchHandler,
-  };
+  return { chat, loading, error, refetch, addMessage };
 };

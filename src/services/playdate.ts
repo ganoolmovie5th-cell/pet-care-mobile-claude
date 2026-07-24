@@ -1,5 +1,100 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PlaydatePost, PlaydateChat, Message } from '../types/playdate';
 
+const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
+// Task 22: API wrappers with AsyncStorage caching
+
+export const createPlaydatePost = async (
+  post: Omit<PlaydatePost, 'id' | 'created_at'>
+): Promise<PlaydatePost> => {
+  const response = await axios.post(`${apiBaseUrl}/playdate/posts`, post);
+  const newPost = response.data as PlaydatePost;
+  // Invalidate cache
+  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  return newPost;
+};
+
+export const getAllActivePosts = async (): Promise<PlaydatePost[]> => {
+  const cached = await AsyncStorage.getItem('playdate_posts_all').catch(() => null);
+  if (cached) return JSON.parse(cached);
+
+  const response = await axios.get(`${apiBaseUrl}/playdate/posts/active/all`);
+  const posts = response.data as PlaydatePost[];
+  await AsyncStorage.setItem('playdate_posts_all', JSON.stringify(posts)).catch(() => {});
+  return posts;
+};
+
+export const getPlaydatePost = async (postId: string): Promise<PlaydatePost> => {
+  const cached = await AsyncStorage.getItem(`playdate_post_${postId}`).catch(() => null);
+  if (cached) return JSON.parse(cached);
+
+  const response = await axios.get(`${apiBaseUrl}/playdate/posts/${postId}`);
+  const post = response.data as PlaydatePost;
+  await AsyncStorage.setItem(`playdate_post_${postId}`, JSON.stringify(post)).catch(() => {});
+  return post;
+};
+
+export const updatePlaydatePost = async (
+  postId: string,
+  updates: Partial<PlaydatePost>
+): Promise<void> => {
+  await axios.patch(`${apiBaseUrl}/playdate/posts/${postId}`, updates);
+  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+};
+
+export const getPlaydatePostsByOwner = async (ownerId: string): Promise<PlaydatePost[]> => {
+  const response = await axios.get(`${apiBaseUrl}/playdate/posts?owner=${ownerId}`);
+  return response.data as PlaydatePost[];
+};
+
+export const addInterestedOwner = async (postId: string): Promise<void> => {
+  await axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interested`);
+  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+};
+
+export const removeInterestedOwner = async (postId: string): Promise<void> => {
+  await axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interested`);
+  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+};
+
+export const createPlaydateChat = async (
+  postId: string,
+  interestedOwnerId: string,
+  initialMessage: string
+): Promise<PlaydateChat> => {
+  const response = await axios.post(`${apiBaseUrl}/playdate/posts/${postId}/chat/start`, {
+    interestedOwnerId,
+    initialMessage,
+  });
+  return response.data as PlaydateChat;
+};
+
+export const getPlaydateChatsByPost = async (postId: string): Promise<PlaydateChat[]> => {
+  const response = await axios.get(`${apiBaseUrl}/playdate/posts/${postId}/chat`);
+  return response.data as PlaydateChat[];
+};
+
+export const getPlaydateChat = async (chatId: string): Promise<PlaydateChat> => {
+  const cached = await AsyncStorage.getItem(`playdate_chat_${chatId}`).catch(() => null);
+  if (cached) return JSON.parse(cached);
+
+  const response = await axios.get(`${apiBaseUrl}/playdate/chat/${chatId}`);
+  const chat = response.data as PlaydateChat;
+  await AsyncStorage.setItem(`playdate_chat_${chatId}`, JSON.stringify(chat)).catch(() => {});
+  return chat;
+};
+
+export const addMessageToChat = async (chatId: string, text: string): Promise<void> => {
+  await axios.post(`${apiBaseUrl}/playdate/chat/${chatId}/message`, { text });
+  await AsyncStorage.removeItem(`playdate_chat_${chatId}`).catch(() => {});
+};
+
+// Legacy exports for compatibility (kept for backward compatibility with old hooks)
 export interface Chat {
   id: string;
   participants: string[];
@@ -18,116 +113,19 @@ export interface ChatMessage {
   read: boolean;
 }
 
-export interface PlaydatePost {
-  id: string;
-  ownerId: string;
-  petId: string;
-  location: {
-    lat: number;
-    lng: number;
-    city: string;
-    address: string;
-  };
-  date: string;
-  time: string;
-  description: string;
-  photos: string[];
-  interested_owners: string[];
-  status: 'open' | 'matched' | 'closed';
-  created_at: string;
-}
-
-export interface PlaydateMatch {
-  id: string;
-  postId: string;
-  ownerId: string;
-  petId: string;
-  interested_date: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  created_at: string;
-}
-
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
-
-export const createPost = async (
-  post: Omit<PlaydatePost, 'id' | 'created_at' | 'interested_owners'>
-): Promise<string> => {
-  const response = await axios.post(`${apiBaseUrl}/playdate/posts`, post);
-  return response.data.id;
+// ponytail: deprecated legacy functions, use new API above
+export const getOrCreateChat = async (): Promise<Chat> => {
+  throw new Error('Deprecated: use createPlaydateChat instead');
 };
 
-export const searchPostsNearby = async (filters: {
-  city: string;
-  lat?: number;
-  lng?: number;
-  maxDistance?: number;
-}): Promise<PlaydatePost[]> => {
-  const params = new URLSearchParams();
-  params.append('city', filters.city);
-  if (filters.lat !== undefined) params.append('lat', filters.lat.toString());
-  if (filters.lng !== undefined) params.append('lng', filters.lng.toString());
-  if (filters.maxDistance !== undefined) params.append('maxDistance', filters.maxDistance.toString());
-
-  const response = await axios.get(`${apiBaseUrl}/playdate/posts?${params}`);
-  return response.data;
+export const sendMessage = async (): Promise<ChatMessage> => {
+  throw new Error('Deprecated: use addMessageToChat instead');
 };
 
-export const getPostById = async (postId: string): Promise<PlaydatePost | null> => {
-  try {
-    const response = await axios.get(`${apiBaseUrl}/playdate/posts/${postId}`);
-    return response.data;
-  } catch (err) {
-    return null;
-  }
+export const getMessages = async (): Promise<ChatMessage[]> => {
+  throw new Error('Deprecated: use getPlaydateChat instead');
 };
 
-export const markInterest = async (postId: string, ownerId: string, petId: string): Promise<string> => {
-  const response = await axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interest`, {
-    ownerId,
-    petId,
-  });
-  return response.data.matchId;
-};
-
-export const removeInterest = async (postId: string, ownerId: string): Promise<void> => {
-  await axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interest`, {
-    data: { ownerId },
-  });
-};
-
-export const getInterestedMatches = async (postId: string): Promise<PlaydateMatch[]> => {
-  const response = await axios.get(`${apiBaseUrl}/playdate/posts/${postId}/matches`);
-  return response.data;
-};
-
-export const acceptMatch = async (matchId: string): Promise<void> => {
-  await axios.post(`${apiBaseUrl}/playdate/matches/${matchId}/accept`);
-};
-
-export const rejectMatch = async (matchId: string): Promise<void> => {
-  await axios.post(`${apiBaseUrl}/playdate/matches/${matchId}/reject`);
-};
-
-export const getOrCreateChat = async (matchId: string, otherUserId: string): Promise<Chat> => {
-  const response = await axios.post(`${apiBaseUrl}/chat`, {
-    matchId,
-    otherUserId,
-  });
-  return response.data;
-};
-
-export const sendMessage = async (chatId: string, text: string): Promise<ChatMessage> => {
-  const response = await axios.post(`${apiBaseUrl}/chat/${chatId}/message`, { text });
-  return response.data;
-};
-
-export const getMessages = async (chatId: string, limit: number = 50): Promise<ChatMessage[]> => {
-  const response = await axios.get(`${apiBaseUrl}/chat/${chatId}/messages`, {
-    params: { limit },
-  });
-  return response.data;
-};
-
-export const markMessagesAsRead = async (chatId: string): Promise<void> => {
-  await axios.post(`${apiBaseUrl}/chat/${chatId}/read`);
+export const markMessagesAsRead = async (): Promise<void> => {
+  throw new Error('Deprecated: no longer supported');
 };

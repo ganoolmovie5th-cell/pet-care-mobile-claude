@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  RefreshControl,
 } from 'react-native';
-import { usePlaydate } from '../../hooks/usePlaydate';
+import { usePlaydatePosts } from '../../hooks/usePlaydate';
 import { PostCard } from '../../components/playdate/PostCard';
 
 interface PlaydateFeedScreenProps {
@@ -19,20 +20,12 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
   onSelectPost,
   onCreatePost,
 }) => {
-  const { posts, loading, error, searchNearby } = usePlaydate();
-  const [selectedCity, setSelectedCity] = useState('Jakarta');
-
-  useEffect(() => {
-    const load = async () => {
-      await searchNearby({ city: selectedCity });
-    };
-    load();
-  }, [selectedCity]);
+  const { posts, loading, error, refetch } = usePlaydatePosts();
 
   if (loading && posts.length === 0) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0f5c4a" />
+        <ActivityIndicator size="large" color="#ff9800" />
       </View>
     );
   }
@@ -54,28 +47,6 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      <View style={styles.cityFilter}>
-        {['Jakarta', 'Surabaya'].map(city => (
-          <TouchableOpacity
-            key={city}
-            style={[
-              styles.cityButton,
-              selectedCity === city && styles.cityButtonActive,
-            ]}
-            onPress={() => setSelectedCity(city)}
-          >
-            <Text
-              style={[
-                styles.cityButtonText,
-                selectedCity === city && styles.cityButtonTextActive,
-              ]}
-            >
-              {city}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
       {posts.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No playdates</Text>
@@ -87,15 +58,22 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
             <PostCard
-              petName={item.petId}
-              city={item.location.city}
+              petName={item.petName || item.petId}
+              breed={item.breed}
+              location={item.location.address || 'Unknown'}
               date={item.date}
-              time={item.time}
               interestedCount={item.interested_owners.length}
+              description={item.description}
               onPress={() => onSelectPost(item.id)}
             />
           )}
-          scrollEnabled={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading}
+              onRefresh={refetch}
+              tintColor="#ff9800"
+            />
+          }
           style={styles.list}
         />
       )}

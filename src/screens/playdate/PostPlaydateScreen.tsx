@@ -10,7 +10,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
-import { usePlaydate } from '../../hooks/usePlaydate';
+import { createPlaydatePost } from '../../services/playdate';
+import { PlaydatePost } from '../../types/playdate';
 
 interface PostPlaydateScreenProps {
   onSave: () => void;
@@ -18,17 +19,15 @@ interface PostPlaydateScreenProps {
 
 export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }) => {
   const { user } = useContext(AuthContext);
-  const { createNewPost, loading } = usePlaydate();
+  const [loading, setLoading] = useState(false);
 
   const [petId, setPetId] = useState('');
-  const [city, setCity] = useState('Jakarta');
   const [address, setAddress] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState('14:00');
   const [description, setDescription] = useState('');
 
   const handleSubmit = async () => {
-    if (!petId || !city || !date || !time || !description) {
+    if (!petId || !date || !description) {
       Alert.alert('Error', 'Please fill all required fields');
       return;
     }
@@ -38,25 +37,29 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
       return;
     }
 
-    const success = await createNewPost({
-      ownerId: user.uid,
-      petId,
-      location: {
-        lat: 0,
-        lng: 0,
-        city,
-        address,
-      },
-      date,
-      time,
-      description,
-      photos: [],
-      status: 'open',
-    });
+    try {
+      setLoading(true);
+      const post: Omit<PlaydatePost, 'id' | 'created_at'> = {
+        ownerId: user.uid,
+        petId,
+        location: {
+          lat: 0,
+          lng: 0,
+          address,
+        },
+        date,
+        description,
+        interested_owners: [],
+        status: 'active',
+      };
 
-    if (success) {
+      await createPlaydatePost(post);
       Alert.alert('Success', 'Playdate posted!');
       onSave();
+    } catch (err) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to post playdate');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,10 +76,10 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
       <Text style={styles.title}>Create Playdate</Text>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Pet ID</Text>
+        <Text style={styles.label}>Pet ID *</Text>
         <TextInput
           style={styles.input}
-          placeholder="Pet ID"
+          placeholder="Enter pet ID"
           value={petId}
           onChangeText={setPetId}
           placeholderTextColor="#aaa"
@@ -84,27 +87,10 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>City</Text>
-        <View style={styles.cityButtons}>
-          {['Jakarta', 'Surabaya'].map(c => (
-            <TouchableOpacity
-              key={c}
-              style={[styles.cityBtn, city === c && styles.cityBtnActive]}
-              onPress={() => setCity(c)}
-            >
-              <Text style={[styles.cityBtnText, city === c && styles.cityBtnTextActive]}>
-                {c}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>Address</Text>
+        <Text style={styles.label}>Location</Text>
         <TextInput
           style={styles.input}
-          placeholder="Location details"
+          placeholder="e.g., Central Park, Jakarta"
           value={address}
           onChangeText={setAddress}
           placeholderTextColor="#aaa"
@@ -112,23 +98,12 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Date (YYYY-MM-DD)</Text>
+        <Text style={styles.label}>Date *</Text>
         <TextInput
           style={styles.input}
-          placeholder="2026-07-23"
+          placeholder="YYYY-MM-DD"
           value={date}
           onChangeText={setDate}
-          placeholderTextColor="#aaa"
-        />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.label}>Time (HH:MM)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="14:00"
-          value={time}
-          onChangeText={setTime}
           placeholderTextColor="#aaa"
         />
       </View>

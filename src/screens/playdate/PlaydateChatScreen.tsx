@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
@@ -11,29 +11,20 @@ import {
   Platform,
 } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
-import { useChatMessage } from '../../hooks/useChatMessage';
+import { usePlaydateChat } from '../../hooks/usePlaydate';
 
 interface PlaydateChatScreenProps {
-  matchId: string;
-  ownerId: string;
+  chatId: string;
 }
 
-export const PlaydateChatScreen: React.FC<PlaydateChatScreenProps> = ({ matchId, ownerId }) => {
+export const PlaydateChatScreen: React.FC<PlaydateChatScreenProps> = ({ chatId }) => {
   const { user } = useContext(AuthContext);
   const [messageText, setMessageText] = useState('');
-  const { messages, loading, error, sendMessage, markAsRead } = useChatMessage(
-    matchId,
-    ownerId,
-    user?.uid || ''
-  );
-
-  useEffect(() => {
-    markAsRead();
-  }, []);
+  const { chat, loading, error, addMessage, refetch } = usePlaydateChat(chatId);
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
-    const success = await sendMessage(messageText);
+    const success = await addMessage(messageText);
     if (success) {
       setMessageText('');
     }
@@ -62,13 +53,13 @@ export const PlaydateChatScreen: React.FC<PlaydateChatScreenProps> = ({ matchId,
       keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
     >
       <FlatList
-        data={messages}
-        keyExtractor={item => item.id}
+        data={chat?.messages || []}
+        keyExtractor={(item, idx) => item.id || idx.toString()}
         renderItem={({ item }) => (
           <View
             style={[
               styles.messageBubble,
-              item.senderId === user?.uid ? styles.sentBubble : styles.receivedBubble,
+              item.sender === user?.uid ? styles.sentBubble : styles.receivedBubble,
             ]}
           >
             <Text style={styles.messageText}>{item.text}</Text>

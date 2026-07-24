@@ -1,49 +1,47 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
-import { usePlaydate } from '../../hooks/usePlaydate';
-import { PlaydatePost } from '../../services/playdate';
+import { AuthContext } from '../../context/AuthContext';
+import { PlaydatePost } from '../../types/playdate';
+import { createPlaydateChat } from '../../services/playdate';
 
 interface PlaydateDetailScreenProps {
   post: PlaydatePost;
-  onChat: (ownerId: string) => void;
+  onChat: (chatId: string) => void;
 }
 
 export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post, onChat }) => {
-  const { matches, loading, fetchMatches, acceptMatchHandler, rejectMatchHandler } = usePlaydate();
+  const { user } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const load = async () => {
-      await fetchMatches(post.id);
-    };
-    load();
-  }, [post.id]);
-
-  const handleAccept = async (matchId: string) => {
-    const success = await acceptMatchHandler(matchId);
-    if (success) {
-      await fetchMatches(post.id);
+  const handleStartChat = async (interestedOwnerId: string) => {
+    if (!user?.uid) {
+      Alert.alert('Error', 'User not authenticated');
+      return;
     }
-  };
 
-  const handleReject = async (matchId: string) => {
-    const success = await rejectMatchHandler(matchId);
-    if (success) {
-      await fetchMatches(post.id);
+    try {
+      setLoading(true);
+      const chat = await createPlaydateChat(post.id, interestedOwnerId, `Hi! I'm interested in your playdate!`);
+      onChat(chat.id);
+    } catch (err) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to start chat');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.petName}>{post.petId}</Text>
+        <Text style={styles.petName}>{post.petName || post.petId}</Text>
         <Text style={styles.status}>{post.status.toUpperCase()}</Text>
       </View>
 
@@ -52,15 +50,21 @@ export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post
         <View style={styles.detail}>
           <Text style={styles.label}>Location:</Text>
           <Text style={styles.value}>
-            {post.location.address}, {post.location.city}
+            {post.location.address || 'Not specified'}
           </Text>
         </View>
         <View style={styles.detail}>
-          <Text style={styles.label}>Date & Time:</Text>
+          <Text style={styles.label}>Date:</Text>
           <Text style={styles.value}>
-            {post.date} at {post.time}
+            {new Date(post.date).toLocaleDateString('id-ID')}
           </Text>
         </View>
+        {post.breed && (
+          <View style={styles.detail}>
+            <Text style={styles.label}>Breed:</Text>
+            <Text style={styles.value}>{post.breed}</Text>
+          </View>
+        )}
         <View style={styles.detail}>
           <Text style={styles.label}>Description:</Text>
           <Text style={styles.value}>{post.description}</Text>
@@ -69,49 +73,26 @@ export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>
-          Interested Owners ({matches.length})
+          Interested Owners ({post.interested_owners.length})
         </Text>
-        {loading ? (
-          <ActivityIndicator size="large" color="#ff9800" />
-        ) : matches.length === 0 ? (
+        {post.interested_owners.length === 0 ? (
           <Text style={styles.emptyText}>No interested owners yet</Text>
         ) : (
-          <FlatList
-            data={matches}
-            keyExtractor={item => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.matchCard}>
-                <View style={styles.matchInfo}>
-                  <Text style={styles.matchOwner}>Owner {item.ownerId.substring(0, 8)}</Text>
-                  <Text style={styles.matchPet}>Pet: {item.petId}</Text>
-                  <Text style={styles.matchStatus}>{item.status}</Text>
-                </View>
-                {item.status === 'pending' && (
-                  <View style={styles.matchActions}>
-                    <TouchableOpacity
-                      style={styles.acceptBtn}
-                      onPress={() => handleAccept(item.id)}
-                    >
-                      <Text style={styles.acceptBtnText}>✓</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.rejectBtn}
-                      onPress={() => handleReject(item.id)}
-                    >
-                      <Text style={styles.rejectBtnText}>✗</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.chatBtn}
-                      onPress={() => onChat(item.ownerId)}
-                    >
-                      <Text style={styles.chatBtnText}>💬</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            )}
-            scrollEnabled={false}
-          />
+          post.interested_owners.map((ownerId) => (
+            <TouchableOpacity
+              key={ownerId}
+              style={styles.matchCard}
+              onPress={() => handleStartChat(ownerId)}
+              disabled={loading}
+            >
+              <Text style={styles.matchOwner}>{ownerId}</Text>
+              {loading ? (
+                <ActivityIndicator size="small" color="#ff9800" />
+              ) : (
+                <Text style={styles.chatBtnText}>→</Text>
+              )}
+            </TouchableOpacity>
+          ))
         )}
       </View>
     </ScrollView>
@@ -182,61 +163,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  matchInfo: {
-    flex: 1,
-  },
   matchOwner: {
     fontSize: 14,
     fontWeight: '600',
   },
-  matchPet: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  matchStatus: {
-    fontSize: 11,
-    color: '#ff9800',
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  matchActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  acceptBtn: {
-    backgroundColor: '#4caf50',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  acceptBtnText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  rejectBtn: {
-    backgroundColor: '#f44336',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  rejectBtnText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  chatBtn: {
-    backgroundColor: '#2196f3',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   chatBtnText: {
     fontSize: 18,
+    color: '#ff9800',
   },
 });

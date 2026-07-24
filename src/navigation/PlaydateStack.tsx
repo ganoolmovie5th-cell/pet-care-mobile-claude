@@ -4,13 +4,13 @@ import { PlaydateFeedScreen } from '../screens/playdate/PlaydateFeedScreen';
 import { PostPlaydateScreen } from '../screens/playdate/PostPlaydateScreen';
 import { PlaydateDetailScreen } from '../screens/playdate/PlaydateDetailScreen';
 import { PlaydateChatScreen } from '../screens/playdate/PlaydateChatScreen';
-import { PlaydatePost } from '../services/playdate';
+import { PlaydatePost } from '../types/playdate';
 
 export type PlaydateStackParamList = {
   Feed: undefined;
   Detail: { post: PlaydatePost };
   Create: undefined;
-  Chat: { matchId: string; ownerId: string };
+  Chat: { chatId: string };
 };
 
 const Stack = createNativeStackNavigator<PlaydateStackParamList>();
@@ -82,8 +82,7 @@ export const PlaydateStack = () => {
       >
         {(props: any) => (
           <PlaydateChatScreen
-            matchId={props.route.params.matchId}
-            ownerId={props.route.params.ownerId}
+            chatId={props.route.params.chatId}
           />
         )}
       </Stack.Screen>
