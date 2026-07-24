@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 interface PetCardProps {
   name: string;
   breed: string;
-  age: number;
+  age?: number;
   onPress: () => void;
 }
 
@@ -17,7 +17,7 @@ export const PetCard: React.FC<PetCardProps> = ({ name, breed, age, onPress }) =
           <View style={styles.badge}>
             <Text style={styles.badgeText}>{breed}</Text>
           </View>
-          <Text style={styles.age}>{age} years</Text>
+          {age !== undefined && <Text style={styles.age}>{age} years</Text>}
         </View>
       </View>
       <Text style={styles.arrow}>›</Text>

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
-import { createPet, getPetsByOwner, addHealthRecord, getHealthRecordsByPet, getAllHealthRecords, Pet, HealthRecord } from '../services/health';
+import { createPet, getPetsByOwner, addHealthRecord, getHealthRecordsByPet, getAllHealthRecords, HealthRecord } from '../services/health';
+import { Pet } from '../types/health';
 
 interface UseHealthReturn {
   pets: Pet[];
