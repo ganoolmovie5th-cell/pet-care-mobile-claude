@@ -7,6 +7,8 @@ import {
   getVaccinationSchedule,
   markVaccineComplete,
 } from '../services/health';
+import { getReminderPreferences, updateReminderPreferences, getReminders, dismissReminder } from '../services/reminders';
+import { getBookingSuggestions, acceptBookingSuggestion } from '../services/booking-suggestions';
 
 const router = express.Router();
 
@@ -71,6 +73,65 @@ router.patch('/vaccination-schedules/:scheduleId/vaccines/:vaccineId', verifyAut
       res.status(404).json({ error: 'Pet not found' });
       return;
     }
+    next(err);
+  }
+});
+
+router.get('/reminders/preferences', verifyAuth, async (req, res, next) => {
+  try {
+    const prefs = await getReminderPreferences((req as any).user.uid);
+    res.json(prefs);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.patch('/reminders/preferences', verifyAuth, async (req, res, next) => {
+  try {
+    await updateReminderPreferences((req as any).user.uid, req.body);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/reminders', verifyAuth, async (req, res, next) => {
+  try {
+    const reminders = await getReminders((req as any).user.uid);
+    res.json(reminders);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/reminders/:reminderId/dismiss', verifyAuth, async (req, res, next) => {
+  try {
+    await dismissReminder(req.params.reminderId);
+    res.json({ success: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/pets/:petId/booking-suggestions', verifyAuth, async (req, res, next) => {
+  try {
+    const pet = await getPetProfile(req.params.petId);
+    if (!pet || pet.ownerId !== (req as any).user.uid) {
+      res.status(404).json({ error: 'Pet not found' });
+      return;
+    }
+    const suggestions = await getBookingSuggestions(req.params.petId);
+    res.json(suggestions);
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/booking-suggestions/:suggestionId/accept', verifyAuth, async (req, res, next) => {
+  try {
+    await acceptBookingSuggestion(req.params.suggestionId);
+    res.json({ success: true });
+  } catch (err) {
     next(err);
   }
 });
