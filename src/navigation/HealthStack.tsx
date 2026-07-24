@@ -9,6 +9,7 @@ import { RemindersScreen } from '../screens/health/RemindersScreen';
 import { EditPetProfileScreen } from '../screens/health/EditPetProfileScreen';
 import VaccinationDashboardScreen from '../screens/health/VaccinationDashboardScreen';
 import ReminderPreferencesScreen from '../screens/health/ReminderPreferencesScreen';
+import BookingSuggestionScreen from '../screens/health/BookingSuggestionScreen';
 
 export type HealthStackParamList = {
   PetList: undefined;
@@ -16,6 +17,7 @@ export type HealthStackParamList = {
   AddRecord: { petId: string };
   EditPetProfile: { petId: string };
   VaccinationDashboard: { petId: string };
+  BookingSuggestion: { petId: string };
   Reminders: undefined;
   ReminderPreferences: undefined;
 };
@@ -106,6 +108,12 @@ const PetListStack = () => {
         options={({ route }: any) => ({
           title: 'Vaccination Status',
         })}
+      />
+
+      <Stack.Screen
+        name="BookingSuggestion"
+        component={BookingSuggestionScreen}
+        options={{ title: 'Booking Suggestion' }}
       />
 
       <Stack.Screen
