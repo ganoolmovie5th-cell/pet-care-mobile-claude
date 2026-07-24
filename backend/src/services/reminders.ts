@@ -66,6 +66,20 @@ export async function getReminders(ownerId: string): Promise<Reminder[]> {
   return remindersSnap.docs.map(d => d.data() as Reminder);
 }
 
-export async function dismissReminder(reminderId: string): Promise<void> {
+export async function dismissReminder(reminderId: string, ownerId: string): Promise<void> {
+  const reminderDoc = await db.collection('reminders').doc(reminderId).get();
+  if (!reminderDoc.exists) throw new Error(`Reminder ${reminderId} not found`);
+
+  const reminder = reminderDoc.data() as Reminder;
+  const petDoc = await db.collection('pets').doc(reminder.petId).get();
+  const pet = petDoc.data() as { ownerId?: string };
+
+  if (!pet || pet.ownerId !== ownerId) {
+    const err = new Error(`Reminder ${reminderId} not found`) as any;
+    err.status = 404;
+    throw err;
+  }
+
   await db.collection('reminders').doc(reminderId).update({ status: 'dismissed' });
+  await logAuditEvent(reminder.petId, 'user', 'reminder_dismissed', { status: 'pending' }, { status: 'dismissed' });
 }

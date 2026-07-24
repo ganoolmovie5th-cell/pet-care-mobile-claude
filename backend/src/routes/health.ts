@@ -106,9 +106,13 @@ router.get('/reminders', verifyAuth, async (req, res, next) => {
 
 router.post('/reminders/:reminderId/dismiss', verifyAuth, async (req, res, next) => {
   try {
-    await dismissReminder(req.params.reminderId);
+    await dismissReminder(req.params.reminderId, (req as any).user.uid);
     res.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
+    if (err.status === 404) {
+      res.status(404).json({ error: 'Reminder not found' });
+      return;
+    }
     next(err);
   }
 });
@@ -129,9 +133,13 @@ router.get('/pets/:petId/booking-suggestions', verifyAuth, async (req, res, next
 
 router.post('/booking-suggestions/:suggestionId/accept', verifyAuth, async (req, res, next) => {
   try {
-    await acceptBookingSuggestion(req.params.suggestionId);
+    await acceptBookingSuggestion(req.params.suggestionId, (req as any).user.uid);
     res.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
+    if (err.status === 404) {
+      res.status(404).json({ error: 'Booking suggestion not found' });
+      return;
+    }
     next(err);
   }
 });

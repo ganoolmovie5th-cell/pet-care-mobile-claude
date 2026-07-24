@@ -1,5 +1,5 @@
 // Mock firebase-admin before any imports that touch db
-const mockAdd = jest.fn().mockResolvedValue({ id: 'log_1' });
+const mockAuditSet = jest.fn().mockResolvedValue(undefined);
 const mockUpdate = jest.fn().mockResolvedValue(undefined);
 const mockSet = jest.fn().mockResolvedValue(undefined);
 
@@ -22,9 +22,17 @@ const mockCollection = jest.fn((name: string) => {
     };
   }
   if (name === 'reminders') {
-    const ref = { id: 'reminder_new', set: mockSet, update: mockUpdate };
     return {
-      doc: jest.fn(() => ref),
+      doc: jest.fn((id: string) => {
+        if (id === 'reminder_1') {
+          return {
+            get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ id: 'reminder_1', petId: 'pet_1', status: 'pending' }) }),
+            update: mockUpdate,
+          };
+        }
+        const ref = { id: 'reminder_new', set: mockSet, update: mockUpdate };
+        return ref;
+      }),
       where: jest.fn().mockReturnThis(),
       orderBy: jest.fn().mockReturnThis(),
       get: jest.fn().mockResolvedValue({ docs: remindersData }),
@@ -32,12 +40,24 @@ const mockCollection = jest.fn((name: string) => {
   }
   if (name === 'pets') {
     return {
+      doc: jest.fn((id: string) => {
+        if (id === 'pet_1') {
+          return {
+            get: jest.fn().mockResolvedValue({ exists: true, data: () => ({ id: 'pet_1', ownerId: 'user_1' }) }),
+          };
+        }
+        return {
+          get: jest.fn().mockResolvedValue({ exists: false, data: () => null }),
+        };
+      }),
       where: jest.fn().mockReturnThis(),
       get: jest.fn().mockResolvedValue({ empty: petsData.length === 0, docs: petsData }),
     };
   }
-  // audit_logs
-  return { add: mockAdd };
+  // auditLogs
+  return {
+    doc: jest.fn(() => ({ id: 'log_1', set: mockAuditSet })),
+  };
 });
 
 jest.mock('firebase-admin', () => ({
@@ -86,7 +106,7 @@ describe('updateReminderPreferences', () => {
       expect.objectContaining({ smsEnabled: false, ownerId: 'user_1' }),
       { merge: true }
     );
-    expect(mockAdd).toHaveBeenCalledWith(expect.objectContaining({ action: 'reminder_preferences_updated' }));
+    expect(mockAuditSet).toHaveBeenCalledWith(expect.objectContaining({ action: 'reminder_preferences_updated' }));
   });
 });
 
@@ -119,7 +139,16 @@ describe('getReminders', () => {
 
 describe('dismissReminder', () => {
   it('updates status to dismissed', async () => {
-    await dismissReminder('reminder_1');
+    await dismissReminder('reminder_1', 'user_1');
     expect(mockUpdate).toHaveBeenCalledWith({ status: 'dismissed' });
+  });
+
+  it('returns 404 if user does not own pet', async () => {
+    try {
+      await dismissReminder('reminder_1', 'user_2');
+      fail('Should throw error');
+    } catch (err: any) {
+      expect(err.status).toBe(404);
+    }
   });
 });

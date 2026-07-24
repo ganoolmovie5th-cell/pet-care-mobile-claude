@@ -42,13 +42,22 @@ export async function getBookingSuggestions(petId: string): Promise<BookingSugge
   return docs.docs.map(doc => doc.data() as BookingSuggestion);
 }
 
-export async function acceptBookingSuggestion(suggestionId: string): Promise<void> {
+export async function acceptBookingSuggestion(suggestionId: string, ownerId: string): Promise<void> {
   const docRef = db.collection('bookingSuggestions').doc(suggestionId);
   const doc = await docRef.get();
 
   if (!doc.exists) throw new Error(`BookingSuggestion ${suggestionId} not found`);
 
   const suggestion = doc.data() as BookingSuggestion;
+  const petDoc = await db.collection('pets').doc(suggestion.petId).get();
+  const pet = petDoc.data() as { ownerId?: string };
+
+  if (!pet || pet.ownerId !== ownerId) {
+    const err = new Error(`BookingSuggestion ${suggestionId} not found`) as any;
+    err.status = 404;
+    throw err;
+  }
+
   const now = new Date().toISOString();
 
   await docRef.update({
