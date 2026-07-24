@@ -1,19 +1,6 @@
 import { db } from './db';
 import { Reminder, ReminderPreferences } from '../types/health';
-
-// ponytail: logAuditEvent stub — Task 6 will provide the real impl
-async function logAuditEvent(params: {
-  petId: string;
-  actor: 'user' | 'system';
-  action: string;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
-}): Promise<void> {
-  await db.collection('audit_logs').add({
-    ...params,
-    timestamp: new Date().toISOString(),
-  });
-}
+import { logAuditEvent } from './audit-log';
 
 const DEFAULT_PREFS = (ownerId: string): ReminderPreferences => ({
   id: ownerId,
@@ -40,7 +27,7 @@ export async function updateReminderPreferences(
     { merge: true }
   );
   // ponytail: audit key is ownerId, not petId — using ownerId as petId field here
-  await logAuditEvent({ petId: ownerId, actor: 'user', action: 'reminder_preferences_updated', before: before as unknown as Record<string, unknown>, after: updates as Record<string, unknown> });
+  await logAuditEvent(ownerId, 'user', 'reminder_preferences_updated', before as unknown as Record<string, unknown>, updates as Record<string, unknown>);
 }
 
 export async function createReminder(

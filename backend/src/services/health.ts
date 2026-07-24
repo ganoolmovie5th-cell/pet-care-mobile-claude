@@ -1,20 +1,7 @@
 import { db } from './db';
 import { Pet, VaccinationSchedule, Vaccine } from '../types/health';
 import { calculateVaccineSchedule } from './vaccine-calculator';
-
-// ponytail: logAuditEvent stub — Task 6 will provide the real impl
-async function logAuditEvent(params: {
-  petId: string;
-  actor: 'user' | 'system';
-  action: string;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
-}): Promise<void> {
-  await db.collection('audit_logs').add({
-    ...params,
-    timestamp: new Date().toISOString(),
-  });
-}
+import { logAuditEvent } from './audit-log';
 
 // --- Pet CRUD (existing baseline) ---
 
@@ -68,7 +55,7 @@ export async function updatePetProfile(
   await db.collection('pets').doc(petId).update(updates);
   const after = { ...before, ...updates };
 
-  await logAuditEvent({ petId, actor: 'user', action: 'update_pet_profile', before: before as unknown as Record<string, unknown>, after: after as unknown as Record<string, unknown> });
+  await logAuditEvent(petId, 'user', 'update_pet_profile', before as unknown as Record<string, unknown>, after as unknown as Record<string, unknown>);
 
   const breedChanged = updates.breed !== undefined && updates.breed !== before.breed;
   const birthdateChanged = updates.birthdate !== undefined && updates.birthdate !== before.birthdate;
@@ -109,7 +96,7 @@ export async function recalculateSchedule(
     await ref.set({ ...scheduleData, id: scheduleId });
   }
 
-  await logAuditEvent({ petId, actor: 'system', action: 'recalculate_schedule', after: { breed, birthdate } });
+  await logAuditEvent(petId, 'system', 'recalculate_schedule', undefined, { breed, birthdate });
 
   return { ...scheduleData, id: scheduleId };
 }
@@ -167,10 +154,11 @@ export async function markVaccineComplete(
   remindersSnap.docs.forEach(d => batch.update(d.ref, { status: 'cancelled' }));
   await batch.commit();
 
-  await logAuditEvent({
-    petId: schedule.petId,
-    actor: 'user',
-    action: 'mark_vaccine_complete',
-    after: { scheduleId, vaccineId, date, vetName, notes },
-  });
+  await logAuditEvent(
+    schedule.petId,
+    'user',
+    'mark_vaccine_complete',
+    undefined,
+    { scheduleId, vaccineId, date, vetName, notes }
+  );
 }
