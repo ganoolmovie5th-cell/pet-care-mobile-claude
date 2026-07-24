@@ -6,11 +6,15 @@ import { PetProfileScreen } from '../screens/health/PetProfileScreen';
 import { HealthDetailScreen } from '../screens/health/HealthDetailScreen';
 import { AddRecordScreen } from '../screens/health/AddRecordScreen';
 import { RemindersScreen } from '../screens/health/RemindersScreen';
+import { EditPetProfileScreen } from '../screens/health/EditPetProfileScreen';
+import VaccinationDashboardScreen from '../screens/health/VaccinationDashboardScreen';
 
 export type HealthStackParamList = {
   PetList: undefined;
   HealthDetail: { petId: string; petName: string };
   AddRecord: { petId: string };
+  EditPetProfile: { petId: string };
+  VaccinationDashboard: { petId: string };
   Reminders: undefined;
 };
 
@@ -79,6 +83,28 @@ const PetListStack = () => {
           />
         )}
       </Stack.Screen>
+
+      <Stack.Screen
+        name="EditPetProfile"
+        options={{ title: 'Edit Pet Profile' }}
+      >
+        {(props: any) => (
+          <EditPetProfileScreen
+            petId={props.route.params.petId}
+            onSave={() => {
+              props.navigation.goBack();
+            }}
+          />
+        )}
+      </Stack.Screen>
+
+      <Stack.Screen
+        name="VaccinationDashboard"
+        component={VaccinationDashboardScreen}
+        options={({ route }: any) => ({
+          title: 'Vaccination Status',
+        })}
+      />
     </Stack.Navigator>
   );
 };
