@@ -2,14 +2,17 @@
 import 'express-async-errors';
 import express, { Request, Response, NextFunction } from 'express';
 import healthRouter from './routes/health';
+import playdateRouter from './routes/playdate';
 
 export * from './types/health';
+export * from './types/playdate';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use('/health', healthRouter);
+app.use('/playdate', playdateRouter);
 
 // Global error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
