@@ -22,7 +22,7 @@ router.post('/pets', verifyAuth, async (req, res, next) => {
 router.get('/pets/:petId', verifyAuth, async (req, res, next) => {
   try {
     const pet = await getPetProfile(req.params.petId);
-    if (!pet) {
+    if (!pet || pet.ownerId !== (req as any).user.uid) {
       res.status(404).json({ error: 'Pet not found' });
       return;
     }
@@ -34,6 +34,11 @@ router.get('/pets/:petId', verifyAuth, async (req, res, next) => {
 
 router.patch('/pets/:petId', verifyAuth, async (req, res, next) => {
   try {
+    const pet = await getPetProfile(req.params.petId);
+    if (!pet || pet.ownerId !== (req as any).user.uid) {
+      res.status(404).json({ error: 'Pet not found' });
+      return;
+    }
     await updatePetProfile(req.params.petId, req.body);
     res.json({ success: true });
   } catch (err) {
@@ -43,6 +48,11 @@ router.patch('/pets/:petId', verifyAuth, async (req, res, next) => {
 
 router.get('/pets/:petId/vaccination-schedule', verifyAuth, async (req, res, next) => {
   try {
+    const pet = await getPetProfile(req.params.petId);
+    if (!pet || pet.ownerId !== (req as any).user.uid) {
+      res.status(404).json({ error: 'Pet not found' });
+      return;
+    }
     const schedule = await getVaccinationSchedule(req.params.petId);
     res.json(schedule);
   } catch (err) {
@@ -53,9 +63,14 @@ router.get('/pets/:petId/vaccination-schedule', verifyAuth, async (req, res, nex
 router.patch('/vaccination-schedules/:scheduleId/vaccines/:vaccineId', verifyAuth, async (req, res, next) => {
   try {
     const { lastDate, vetName, notes } = req.body;
-    await markVaccineComplete(req.params.scheduleId, req.params.vaccineId, lastDate, vetName, notes);
+    // ponytail: ownership via schedule→petId→pet.ownerId; markVaccineComplete already fetches schedule
+    await markVaccineComplete(req.params.scheduleId, req.params.vaccineId, lastDate, vetName, notes, (req as any).user.uid);
     res.json({ success: true });
-  } catch (err) {
+  } catch (err: any) {
+    if (err.status === 404) {
+      res.status(404).json({ error: 'Pet not found' });
+      return;
+    }
     next(err);
   }
 });

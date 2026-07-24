@@ -128,13 +128,19 @@ export async function markVaccineComplete(
   vaccineId: string,
   date: string,
   vetName: string,
-  notes?: string
+  notes?: string,
+  requestingUid?: string
 ): Promise<void> {
   const schedRef = db.collection('vaccination_schedules').doc(scheduleId);
   const schedDoc = await schedRef.get();
   if (!schedDoc.exists) throw new Error(`Schedule ${scheduleId} not found`);
 
   const schedule = schedDoc.data() as VaccinationSchedule;
+
+  if (requestingUid !== undefined) {
+    const pet = await getPetProfile(schedule.petId);
+    if (!pet || pet.ownerId !== requestingUid) throw Object.assign(new Error('Pet not found'), { status: 404 });
+  }
   const vaccines: Vaccine[] = schedule.vaccines.map(v =>
     v.id === vaccineId ? { ...v, status: 'completed' as const, lastDate: date } : v
   );
