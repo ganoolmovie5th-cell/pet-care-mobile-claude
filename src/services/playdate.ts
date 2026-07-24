@@ -1,19 +1,52 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlaydatePost, PlaydateChat, Message } from '../types/playdate';
+import { enqueueMutation, processSyncQueue } from './offline';
 
 const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+
+// Phase 5: Retry logic with exponential backoff
+const exponentialBackoff = (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 30000);
+
+const retryRequest = async <T>(
+  fn: () => Promise<T>,
+  maxRetries = 3,
+  attempt = 0
+): Promise<T> => {
+  try {
+    return await fn();
+  } catch (err: any) {
+    if (attempt < maxRetries && (err.code === 'ECONNREFUSED' || err.response?.status >= 500)) {
+      const delay = exponentialBackoff(attempt);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return retryRequest(fn, maxRetries, attempt + 1);
+    }
+    throw err;
+  }
+};
 
 // Task 22: API wrappers with AsyncStorage caching
 
 export const createPlaydatePost = async (
   post: Omit<PlaydatePost, 'id' | 'created_at'>
 ): Promise<PlaydatePost> => {
-  const response = await axios.post(`${apiBaseUrl}/playdate/posts`, post);
-  const newPost = response.data as PlaydatePost;
-  // Invalidate cache
-  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
-  return newPost;
+  try {
+    const response = await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/posts`, post));
+    const newPost = response.data as PlaydatePost;
+    await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+    return newPost;
+  } catch (err) {
+    // Phase 5: Queue for offline sync
+    await enqueueMutation(`${apiBaseUrl}/playdate/posts`, 'POST', post);
+    // Return optimistic placeholder with local ID
+    const now = new Date().toISOString();
+    return {
+      id: `local_${Date.now()}`,
+      created_at: now,
+      ...post,
+      updated_at: now,
+    } as PlaydatePost;
+  }
 };
 
 export const getAllActivePosts = async (): Promise<PlaydatePost[]> => {
@@ -40,9 +73,14 @@ export const updatePlaydatePost = async (
   postId: string,
   updates: Partial<PlaydatePost>
 ): Promise<void> => {
-  await axios.patch(`${apiBaseUrl}/playdate/posts/${postId}`, updates);
-  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
-  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  try {
+    await retryRequest(() => axios.patch(`${apiBaseUrl}/playdate/posts/${postId}`, updates));
+    await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+    await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  } catch (err) {
+    // Phase 5: Queue for offline sync
+    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}`, 'PATCH', updates);
+  }
 };
 
 export const getPlaydatePostsByOwner = async (ownerId: string): Promise<PlaydatePost[]> => {
@@ -51,15 +89,23 @@ export const getPlaydatePostsByOwner = async (ownerId: string): Promise<Playdate
 };
 
 export const addInterestedOwner = async (postId: string): Promise<void> => {
-  await axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interested`);
-  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
-  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  try {
+    await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interested`));
+    await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+    await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  } catch (err) {
+    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}/interested`, 'POST', {});
+  }
 };
 
 export const removeInterestedOwner = async (postId: string): Promise<void> => {
-  await axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interested`);
-  await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
-  await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  try {
+    await retryRequest(() => axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interested`));
+    await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
+    await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
+  } catch (err) {
+    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}/interested`, 'DELETE', {});
+  }
 };
 
 export const createPlaydateChat = async (
@@ -67,11 +113,32 @@ export const createPlaydateChat = async (
   interestedOwnerId: string,
   initialMessage: string
 ): Promise<PlaydateChat> => {
-  const response = await axios.post(`${apiBaseUrl}/playdate/posts/${postId}/chat/start`, {
-    interestedOwnerId,
-    initialMessage,
-  });
-  return response.data as PlaydateChat;
+  try {
+    const response = await retryRequest(() =>
+      axios.post(`${apiBaseUrl}/playdate/posts/${postId}/chat/start`, {
+        interestedOwnerId,
+        initialMessage,
+      })
+    );
+    return response.data as PlaydateChat;
+  } catch (err) {
+    // Phase 5: Queue for offline sync
+    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}/chat/start`, 'POST', {
+      interestedOwnerId,
+      initialMessage,
+    });
+    // Return optimistic placeholder
+    const now = new Date().toISOString();
+    return {
+      id: `local_chat_${Date.now()}`,
+      postId,
+      ownerId: 'current-user',
+      interestedOwnerId,
+      messages: [{ sender: 'current-user', text: initialMessage, timestamp: now }],
+      status: 'active',
+      created_at: now,
+    } as PlaydateChat;
+  }
 };
 
 export const getPlaydateChatsByPost = async (postId: string): Promise<PlaydateChat[]> => {
@@ -90,8 +157,13 @@ export const getPlaydateChat = async (chatId: string): Promise<PlaydateChat> => 
 };
 
 export const addMessageToChat = async (chatId: string, text: string): Promise<void> => {
-  await axios.post(`${apiBaseUrl}/playdate/chat/${chatId}/message`, { text });
-  await AsyncStorage.removeItem(`playdate_chat_${chatId}`).catch(() => {});
+  try {
+    await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/chat/${chatId}/message`, { text }));
+    await AsyncStorage.removeItem(`playdate_chat_${chatId}`).catch(() => {});
+  } catch (err) {
+    // Phase 5: Queue for offline sync
+    await enqueueMutation(`${apiBaseUrl}/playdate/chat/${chatId}/message`, 'POST', { text });
+  }
 };
 
 // Legacy exports for compatibility (kept for backward compatibility with old hooks)
