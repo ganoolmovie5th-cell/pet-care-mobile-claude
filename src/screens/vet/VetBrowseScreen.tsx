@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, FlatList, Text, TouchableOpacity, ActivityIndicator, StyleSheet, SectionList } from 'react-native';
 import { useVet } from '../../hooks/useVet';
+import { useRecommendations } from '../../hooks/useRecommendations';
+import { useLocation } from '../../hooks/useLocation';
+import { useAuth } from '../../hooks/useAuth';
+import { RecommendedVet } from '../../services/recommendations';
 
 interface VetBrowseScreenProps {
   onVetSelect: (vetId: string) => void;
@@ -8,6 +12,15 @@ interface VetBrowseScreenProps {
 
 export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect }) => {
   const { vets, loading, error, fetchAllVets } = useVet();
+  const { user } = useAuth();
+  const { location } = useLocation();
+  const { recommendations, loading: recLoading } = useRecommendations(
+    user?.uid || null,
+    location?.lat || null,
+    location?.lng || null,
+    null,
+    5
+  );
   const [city, setCity] = useState('');
 
   useEffect(() => {
@@ -50,21 +63,49 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <FlatList
-        data={vets}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.vetCard}
-            onPress={() => onVetSelect(item.id)}
-          >
-            <Text style={styles.vetName}>{item.clinic_name}</Text>
-            <Text style={styles.vetInfo}>{item.location.city}</Text>
-            <View style={styles.ratingRow}>
-              <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
-              <Text style={styles.fee}>Rp {item.consultation_fee.toLocaleString()}</Text>
-            </View>
-          </TouchableOpacity>
+      <SectionList
+        sections={[
+          {
+            title: 'Recommended for you',
+            data: recommendations.length > 0 ? recommendations : [],
+            renderItem: ({ item }: { item: RecommendedVet }) => (
+              <TouchableOpacity
+                style={[styles.vetCard, styles.recommendedCard]}
+                onPress={() => onVetSelect(item.id)}
+              >
+                <View style={styles.recommendedHeader}>
+                  <Text style={styles.vetName}>{item.clinic_name}</Text>
+                  <Text style={styles.rankReasonBadge}>{item.rank_reason}</Text>
+                </View>
+                <Text style={styles.vetInfo}>{item.location.city} • {item.distance_km}km</Text>
+                <View style={styles.ratingRow}>
+                  <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
+                  <Text style={styles.fee}>Rp {item.consultation_fee.toLocaleString()}</Text>
+                </View>
+              </TouchableOpacity>
+            ),
+          },
+          {
+            title: 'All Vets',
+            data: vets,
+            renderItem: ({ item }) => (
+              <TouchableOpacity
+                style={styles.vetCard}
+                onPress={() => onVetSelect(item.id)}
+              >
+                <Text style={styles.vetName}>{item.clinic_name}</Text>
+                <Text style={styles.vetInfo}>{item.location.city}</Text>
+                <View style={styles.ratingRow}>
+                  <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
+                  <Text style={styles.fee}>Rp {item.consultation_fee.toLocaleString()}</Text>
+                </View>
+              </TouchableOpacity>
+            ),
+          },
+        ]}
+        keyExtractor={(item, index) => item.id + index}
+        renderSectionHeader={({ section: { title } }) => (
+          <Text style={styles.sectionTitle}>{title}</Text>
         )}
       />
     </View>
@@ -141,5 +182,33 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 16,
+    color: '#0f5c4a',
+  },
+  recommendedCard: {
+    backgroundColor: '#f0f8f6',
+    borderLeftColor: '#FFD700',
+    borderLeftWidth: 4,
+  },
+  recommendedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  rankReasonBadge: {
+    fontSize: 10,
+    fontWeight: '600',
+    backgroundColor: '#0f5c4a',
+    color: '#fff',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
   },
 });

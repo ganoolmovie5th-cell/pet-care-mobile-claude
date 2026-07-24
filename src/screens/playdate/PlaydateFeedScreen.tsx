@@ -20,7 +20,23 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
   onSelectPost,
   onCreatePost,
 }) => {
-  const { posts, loading, error, refetch } = usePlaydatePosts();
+  const { user } = useAuth();
+  const { location } = useLocation();
+  const [showMatches, setShowMatches] = useState(true);
+
+  // Use geo-matching if location available, else fallback to all posts
+  const { matches, loading: matchLoading, refresh: refreshMatches } = usePlaydateMatches(
+    location?.lat || null,
+    location?.lng || null,
+    null,
+    5,
+    'score'
+  );
+  const { posts, loading: postsLoading, error: postsError, refetch } = usePlaydatePosts();
+
+  const displayPosts = showMatches && location && matches.length > 0 ? matches : posts;
+  const loading = showMatches && location ? matchLoading : postsLoading;
+  const error = showMatches && location ? null : postsError;
 
   if (loading && posts.length === 0) {
     return (
@@ -47,30 +63,52 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      {posts.length === 0 ? (
+      {location && (
+        <View style={styles.filterRow}>
+          <TouchableOpacity
+            style={[styles.filterBtn, showMatches && styles.filterBtnActive]}
+            onPress={() => setShowMatches(true)}
+          >
+            <Text style={styles.filterBtnText}>Matched</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterBtn, !showMatches && styles.filterBtnActive]}
+            onPress={() => setShowMatches(false)}
+          >
+            <Text style={styles.filterBtnText}>All</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {displayPosts.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No playdates</Text>
           <Text style={styles.emptySubtext}>Be the first to post</Text>
         </View>
       ) : (
         <FlatList
-          data={posts}
-          keyExtractor={item => item.id}
+          data={displayPosts}
+          keyExtractor={item => item.id || item.postId}
           renderItem={({ item }) => (
-            <PostCard
-              petName={item.petName || item.petId}
-              breed={item.breed}
-              location={item.location.address || 'Unknown'}
-              date={item.date}
-              interestedCount={item.interested_owners.length}
-              description={item.description}
-              onPress={() => onSelectPost(item.id)}
-            />
+            <View>
+              <PostCard
+                petName={item.petName || item.petId}
+                breed={item.breed}
+                location={item.location.address || 'Unknown'}
+                date={item.date}
+                interestedCount={item.interested_owners?.length || 0}
+                description={item.description}
+                onPress={() => onSelectPost(item.id || item.postId)}
+              />
+              {showMatches && 'match_score' in item && (
+                <Text style={styles.matchScore}>Match: {(item as any).match_score}%</Text>
+              )}
+            </View>
           )}
           refreshControl={
             <RefreshControl
               refreshing={loading}
-              onRefresh={refetch}
+              onRefresh={showMatches && location ? refreshMatches : refetch}
               tintColor="#ff9800"
             />
           }
@@ -159,5 +197,34 @@ const styles = StyleSheet.create({
   emptySubtext: {
     fontSize: 14,
     color: '#666',
+  },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
+  },
+  filterBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  filterBtnActive: {
+    backgroundColor: '#ff9800',
+    borderColor: '#ff9800',
+  },
+  filterBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  matchScore: {
+    fontSize: 12,
+    color: '#ff9800',
+    fontWeight: '600',
+    marginLeft: 16,
+    marginBottom: 8,
   },
 });

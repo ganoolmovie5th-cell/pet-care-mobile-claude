@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet, FlatList } from 'react-native';
 import { useVet } from '../../hooks/useVet';
 import { Vet } from '../../services/vet';
+import { getReviewsForTarget, markReviewHelpful, Review } from '../../services/review';
 
 interface VetDetailScreenProps {
   vetId: string;
@@ -11,6 +12,9 @@ interface VetDetailScreenProps {
 export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooking }) => {
   const { loading, error, fetchVetById } = useVet();
   const [vet, setVet] = useState<Vet | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
 
   useEffect(() => {
     const loadVet = async () => {
@@ -19,6 +23,38 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
     };
     loadVet();
   }, [vetId]);
+
+  useEffect(() => {
+    const loadReviews = async () => {
+      setReviewsLoading(true);
+      try {
+        const response = await getReviewsForTarget(vetId, 'vet', 'recent', 20, 0);
+        setReviews(response.reviews);
+      } catch (err) {
+        console.error('Error loading reviews:', err);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    if (vetId) {
+      loadReviews();
+    }
+  }, [vetId]);
+
+  const handleMarkHelpful = async (reviewId: string) => {
+    try {
+      await markReviewHelpful(reviewId);
+      setReviews(prev =>
+        prev.map(r => (r.id === reviewId ? { ...r, helpful_count: r.helpful_count + 1 } : r))
+      );
+    } catch (err) {
+      console.error('Error marking review helpful:', err);
+    }
+  };
+
+  const filteredReviews = ratingFilter
+    ? reviews.filter(r => r.rating === ratingFilter)
+    : reviews;
 
   if (loading) {
     return (
@@ -71,6 +107,53 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Consultation Fee</Text>
         <Text style={styles.fee}>Rp {vet.consultation_fee.toLocaleString()}</Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Reviews ({reviews.length})</Text>
+        <View style={styles.ratingFilterRow}>
+          {[1, 2, 3, 4, 5].map(star => (
+            <TouchableOpacity
+              key={star}
+              onPress={() => setRatingFilter(ratingFilter === star ? null : star)}
+              style={[
+                styles.ratingFilterButton,
+                ratingFilter === star && styles.ratingFilterButtonActive,
+              ]}
+            >
+              <Text style={styles.ratingFilterText}>{star}★</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {reviewsLoading ? (
+          <ActivityIndicator size="small" color="#0f5c4a" />
+        ) : filteredReviews.length === 0 ? (
+          <Text style={styles.noReviews}>No reviews yet</Text>
+        ) : (
+          <View style={styles.reviewsList}>
+            {filteredReviews.map(review => (
+              <View key={review.id} style={styles.reviewCard}>
+                <View style={styles.reviewHeader}>
+                  <Text style={styles.reviewRating}>{'★'.repeat(review.rating)}</Text>
+                  <Text style={styles.reviewVerified}>{review.verified ? '✓ Verified' : ''}</Text>
+                </View>
+                {review.text && <Text style={styles.reviewText}>{review.text}</Text>}
+                <View style={styles.reviewFooter}>
+                  <TouchableOpacity
+                    onPress={() => handleMarkHelpful(review.id)}
+                    style={styles.helpfulButton}
+                  >
+                    <Text style={styles.helpfulText}>👍 {review.helpful_count}</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.reviewDate}>
+                    {new Date(review.created_at).toLocaleDateString()}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity
@@ -166,5 +249,79 @@ const styles = StyleSheet.create({
   error: {
     color: 'red',
     fontSize: 16,
+  },
+  ratingFilterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  ratingFilterButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#f0f0f0',
+  },
+  ratingFilterButtonActive: {
+    backgroundColor: '#0f5c4a',
+  },
+  ratingFilterText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#333',
+  },
+  reviewsList: {
+    gap: 12,
+  },
+  reviewCard: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 12,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FFD700',
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  reviewRating: {
+    fontSize: 14,
+    color: '#FFD700',
+  },
+  reviewVerified: {
+    fontSize: 12,
+    color: '#0f5c4a',
+    fontWeight: '600',
+  },
+  reviewText: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 8,
+    lineHeight: 18,
+  },
+  reviewFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  helpfulButton: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  helpfulText: {
+    fontSize: 12,
+    color: '#0f5c4a',
+    fontWeight: '600',
+  },
+  reviewDate: {
+    fontSize: 11,
+    color: '#999',
+  },
+  noReviews: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    paddingVertical: 16,
   },
 });

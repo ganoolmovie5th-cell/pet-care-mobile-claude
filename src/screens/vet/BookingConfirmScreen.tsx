@@ -10,12 +10,16 @@ import {
   ScrollView,
 } from 'react-native';
 import { usePayment } from '../../hooks/usePayment';
+import ReviewScreen from './ReviewScreen';
 
 interface BookingConfirmScreenProps {
   bookingId: string;
   amount: number;
   petName: string;
+  vetName: string;
   vetClinicName: string;
+  vetId: string;
+  userId: string;
   onPaymentComplete: () => void;
 }
 
@@ -23,11 +27,15 @@ export const BookingConfirmScreen: React.FC<BookingConfirmScreenProps> = ({
   bookingId,
   amount,
   petName,
+  vetName,
   vetClinicName,
+  vetId,
+  userId,
   onPaymentComplete,
 }) => {
   const { invoice, loading, error, createNewInvoice, checkStatus } = usePayment();
   const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
+  const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
     initializePayment();
@@ -142,17 +150,32 @@ export const BookingConfirmScreen: React.FC<BookingConfirmScreenProps> = ({
         </View>
       )}
 
-      {invoice?.status === 'PAID' && (
+      {invoice?.status === 'PAID' && !showReview && (
         <View style={styles.section}>
           <View style={styles.successCard}>
             <Text style={styles.successText}>✓ Payment Confirmed</Text>
             <Text style={styles.successSubtext}>Your booking is confirmed!</Text>
           </View>
 
-          <TouchableOpacity style={styles.doneButton} onPress={onPaymentComplete}>
-            <Text style={styles.doneButtonText}>Done</Text>
+          <TouchableOpacity style={styles.doneButton} onPress={() => setShowReview(true)}>
+            <Text style={styles.doneButtonText}>Continue to Review (optional)</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.skipButton} onPress={onPaymentComplete}>
+            <Text style={styles.skipButtonText}>Skip</Text>
           </TouchableOpacity>
         </View>
+      )}
+
+      {showReview && (
+        <ReviewScreen
+          userId={userId}
+          vetId={vetId}
+          bookingId={bookingId}
+          vetClinicName={vetClinicName}
+          onSuccess={onPaymentComplete}
+          onCancel={() => setShowReview(false)}
+        />
       )}
     </ScrollView>
   );
@@ -246,10 +269,24 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 12,
   },
   doneButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  skipButton: {
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  skipButtonText: {
+    color: '#666',
+    fontSize: 14,
     fontWeight: '600',
   },
   loadingText: {
