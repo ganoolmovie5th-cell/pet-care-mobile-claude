@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useHealth } from '../../hooks/useHealth';
 import { HealthRecord } from '../../services/health';
 import { RecordCard } from '../../components/health/RecordCard';
@@ -22,6 +24,7 @@ export const HealthDetailScreen: React.FC<HealthDetailScreenProps> = ({
   petName,
   onAddRecord,
 }) => {
+  const navigation = useNavigation<any>();
   const { records, loading, error, fetchRecords } = useHealth();
   const [petRecords, setPetRecords] = useState<HealthRecord[]>([]);
 
@@ -65,6 +68,34 @@ export const HealthDetailScreen: React.FC<HealthDetailScreenProps> = ({
       >
         <Text style={styles.addButtonText}>+ Add Record</Text>
       </TouchableOpacity>
+
+      <View style={styles.actionsSection}>
+        <Text style={styles.sectionTitle}>Health Management</Text>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('EditPetProfile', { petId })}
+        >
+          <Text style={styles.actionButtonText}>Edit Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('VaccinationDashboard', { petId })}
+        >
+          <Text style={styles.actionButtonText}>Vaccination Status</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('ReminderPreferences')}
+        >
+          <Text style={styles.actionButtonText}>Reminder Settings</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => navigation.navigate('BookingSuggestion', { petId })}
+        >
+          <Text style={styles.actionButtonText}>Vet Booking</Text>
+        </TouchableOpacity>
+      </View>
 
       {petRecords.length === 0 ? (
         <View style={styles.emptyState}>
@@ -151,5 +182,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+  },
+  actionsSection: {
+    marginBottom: 24,
+    paddingHorizontal: 8,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 12,
+    paddingHorizontal: 8,
+  },
+  actionButton: {
+    backgroundColor: '#0f5c4a',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
