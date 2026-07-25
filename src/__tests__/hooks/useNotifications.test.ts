@@ -137,7 +137,7 @@ describe('useNotifications Hook', () => {
       const { result } = renderHook(() => useNotifications());
 
       await act(async () => {
-        result.current.setupFCM();
+        result.current.setupFCM('user-123');
       });
 
       expect(notificationService.setupFCMListeners).toHaveBeenCalled();

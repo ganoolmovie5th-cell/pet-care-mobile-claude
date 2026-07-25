@@ -15,16 +15,15 @@ export const useReview = () => {
     try {
       setLoading(true);
       setError(null);
-      const id = await createReviewAPI({
-        reviewerId: data.userId,
-        targetId: data.vetId,
-        type: 'vet',
-        rating: data.rating,
-        text: data.text,
-        bookingId: data.bookingId,
-        verified: true,
-      });
-      return id;
+      const result = await createReviewAPI(
+        data.userId,
+        data.vetId,
+        'vet',
+        data.rating,
+        data.text,
+        data.bookingId
+      );
+      return result.id;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to create review';
       setError(msg);

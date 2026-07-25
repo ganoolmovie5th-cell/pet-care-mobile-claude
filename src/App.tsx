@@ -24,7 +24,7 @@ function AppContent() {
             user.uid,
             Platform.OS === 'ios' ? 'iOS' : 'Android'
           );
-          setupFCM();
+          setupFCM(user.uid);
         }
       } catch (error) {
         console.error('FCM initialization failed:', error);

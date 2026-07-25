@@ -14,9 +14,6 @@ export const initSentry = () => {
     environment: process.env.NODE_ENV || 'development',
     attachStacktrace: true,
     maxBreadcrumbs: 50,
-    integrations: [
-      new Sentry.ReactNativeIntegration(),
-    ],
   });
 };
 

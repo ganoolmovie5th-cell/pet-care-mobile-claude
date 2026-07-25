@@ -58,9 +58,9 @@ describe('useReview Hook', () => {
 
       const { result } = renderHook(() => useReview());
 
-      let reviews: any[] = [];
+      let reviews: any;
       await act(async () => {
-        reviews = await result.current.getReviewsForTarget('vet-456', 'vet', 'recent', 10);
+        reviews = await result.current.getReviewsForTarget('vet-456', 'recent', 10);
       });
 
       expect(reviews).toEqual(mockReviews);
@@ -72,9 +72,9 @@ describe('useReview Hook', () => {
 
       const { result } = renderHook(() => useReview());
 
-      let reviews: any[] = [];
+      let reviews: any;
       await act(async () => {
-        reviews = await result.current.getReviewsForTarget('vet-unknown', 'vet');
+        reviews = await result.current.getReviewsForTarget('vet-unknown');
       });
 
       expect(reviews).toEqual([]);

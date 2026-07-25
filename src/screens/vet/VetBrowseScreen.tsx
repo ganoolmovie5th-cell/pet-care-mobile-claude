@@ -5,13 +5,14 @@ import { useRecommendations } from '../../hooks/useRecommendations';
 import { useLocation } from '../../hooks/useLocation';
 import { useAuth } from '../../hooks/useAuth';
 import { RecommendedVet } from '../../services/recommendations';
+import { Vet } from '../../services/vet';
 
 interface VetBrowseScreenProps {
   onVetSelect: (vetId: string) => void;
 }
 
 export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect }) => {
-  const { vets, loading, error, fetchAllVets } = useVet();
+  const { vets, loading, error, fetchAllVets, searchVetsByFilters } = useVet();
   const { user } = useAuth();
   const { location } = useLocation();
   const { recommendations, loading: recLoading } = useRecommendations(
@@ -25,11 +26,7 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
 
   useEffect(() => {
     if (city) {
-      const searchByCity = async () => {
-        const { searchVetsByFilters } = useVet();
-        await searchVetsByFilters({ city });
-      };
-      searchByCity();
+      searchVetsByFilters({ city });
     } else {
       fetchAllVets();
     }
@@ -63,27 +60,30 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
 
       {error && <Text style={styles.error}>{error}</Text>}
 
-      <SectionList
+      <SectionList<RecommendedVet | Vet>
         sections={[
           {
             title: 'Recommended for you',
             data: recommendations.length > 0 ? recommendations : [],
-            renderItem: ({ item }: { item: RecommendedVet }) => (
+            renderItem: ({ item }) => {
+              const rec = item as RecommendedVet;
+              return (
               <TouchableOpacity
                 style={[styles.vetCard, styles.recommendedCard]}
-                onPress={() => onVetSelect(item.id)}
+                onPress={() => onVetSelect(rec.id)}
               >
                 <View style={styles.recommendedHeader}>
-                  <Text style={styles.vetName}>{item.clinic_name}</Text>
-                  <Text style={styles.rankReasonBadge}>{item.rank_reason}</Text>
+                  <Text style={styles.vetName}>{rec.clinic_name}</Text>
+                  <Text style={styles.rankReasonBadge}>{rec.rank_reason}</Text>
                 </View>
-                <Text style={styles.vetInfo}>{item.location.city} • {item.distance_km}km</Text>
+                <Text style={styles.vetInfo}>{rec.location.city} • {rec.distance_km}km</Text>
                 <View style={styles.ratingRow}>
-                  <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
-                  <Text style={styles.fee}>Rp {item.consultation_fee.toLocaleString()}</Text>
+                  <Text style={styles.rating}>⭐ {rec.rating.toFixed(1)}</Text>
+                  <Text style={styles.fee}>Rp {rec.consultation_fee.toLocaleString()}</Text>
                 </View>
               </TouchableOpacity>
-            ),
+              );
+            },
           },
           {
             title: 'All Vets',

@@ -9,6 +9,9 @@ import {
   RefreshControl,
 } from 'react-native';
 import { usePlaydatePosts } from '../../hooks/usePlaydate';
+import { useAuth } from '../../hooks/useAuth';
+import { useLocation } from '../../hooks/useLocation';
+import { usePlaydateMatches } from '../../hooks/usePlaydateMatches';
 import { PostCard } from '../../components/playdate/PostCard';
 
 interface PlaydateFeedScreenProps {
@@ -86,7 +89,7 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
           <Text style={styles.emptySubtext}>Be the first to post</Text>
         </View>
       ) : (
-        <FlatList
+        <FlatList<any>
           data={displayPosts}
           keyExtractor={item => item.id || item.postId}
           renderItem={({ item }) => (

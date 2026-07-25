@@ -8,8 +8,8 @@ import {
   Alert,
   ActivityIndicator,
   StyleSheet,
-  Picker,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { getPetProfile, updatePetProfile } from '../../services/health';
 import { Pet } from '../../types/health';
 
