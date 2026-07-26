@@ -1,8 +1,6 @@
 # Pet Care Community — React Native Mobile App
 
-**Status:** MVP Implementation  
-**Timeline:** 5-6 weeks solo development  
-**Target:** 10K owners (Jakarta/Surabaya), 5% subscription conversion
+**Status:** Code complete — awaiting production credentials (GCP, Firebase, EAS)
 
 ## Overview
 
@@ -134,12 +132,14 @@ cp .env.example .env
 # Fill in: EXPO_PUBLIC_FIREBASE_API_KEY, EXPO_PUBLIC_FIREBASE_PROJECT_ID, EXPO_PUBLIC_API_BASE_URL
 
 # Start dev server
-npm run web              # Opens Expo Go web preview
-npm run android          # Build for Android
-npm run ios              # Build for iOS (macOS only)
+npm start                # Expo dev server (scan QR with Expo Go)
+npm run web              # Expo web preview
 
-# Run tests
-npm test
+# Quality gates
+npm test                 # Jest (15 suites / 101 tests)
+npm run lint             # ESLint, zero warnings enforced
+npx tsc --noEmit         # Type check
+npm run format           # Prettier
 ```
 
 ## Development Workflow
@@ -204,15 +204,12 @@ Then use Expo Go app (iOS/Android) to scan QR code and run app on device.
 
 ## Testing
 
-- **Unit tests** (Jest): Services, hooks, utils
-- **Integration tests** (Firebase Emulator): Database, auth flows
-- **E2E tests** (Detox): Full user flows (login → booking → payment)
+Jest + `@testing-library/react-native`, 15 suites / 101 tests covering hooks,
+screens, and navigation. Service modules are mocked; no emulator needed.
 
-Run tests:
 ```bash
 npm test                    # Run all tests
-npm test -- --watch        # Watch mode
-npm run test:coverage      # Coverage report
+npm test -- --watch         # Watch mode
 ```
 
 ## Performance Tips
@@ -261,12 +258,8 @@ Check `.env` file has all required keys from `.env.example`
 Clear Expo cache: `npm run web -- --clear`
 
 **Tests failing:**
-Check Firebase Emulator running: `firebase emulators:start`
-
-## Support & Feedback
-
-Issues & feedback tracked in GitHub Issues. Daily feedback loop during MVP iteration.
+Run `npx jest --clearCache` then `npm test`
 
 ---
 
-**Next Steps:** Set up local dev environment, run `npm run web`, verify Phone/OTP screens render.
+**Next Steps:** Supply production credentials (see `../pet-care-claude/DEPLOY.md`) — GCP for backend, Firebase env for web/admin, EAS for store builds.
