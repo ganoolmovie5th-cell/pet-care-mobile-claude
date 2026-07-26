@@ -6,7 +6,7 @@ import { getReviewsForTarget, markReviewHelpful, Review } from '../../services/r
 
 interface VetDetailScreenProps {
   vetId: string;
-  onBooking: (vetId: string) => void;
+  onBooking: (vet: Vet) => void;
 }
 
 export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooking }) => {
@@ -158,7 +158,7 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
 
       <TouchableOpacity
         style={styles.bookButton}
-        onPress={() => onBooking(vetId)}
+        onPress={() => onBooking(vet)}
       >
         <Text style={styles.bookButtonText}>Book Appointment</Text>
       </TouchableOpacity>

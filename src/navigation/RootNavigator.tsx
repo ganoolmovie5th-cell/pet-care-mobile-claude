@@ -5,15 +5,9 @@ import { AuthContext } from '../context/AuthContext';
 import { AuthStack } from './AuthStack';
 import { HealthStack } from './HealthStack';
 import { PlaydateStack } from './PlaydateStack';
+import { VetStack } from './VetStack';
 
 const Tab = createBottomTabNavigator();
-
-const VetStackPlaceholder = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>Vet Marketplace (TBD)</Text>
-  </View>
-);
-
 
 const ProfileStackPlaceholder = () => (
   <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -38,11 +32,12 @@ const MainTabs = () => {
     >
       <Tab.Screen
         name="VetTab"
-        component={VetStackPlaceholder}
+        component={VetStack}
         options={{
           title: 'Vets',
           tabBarLabel: 'Vets',
           tabBarIcon: () => <Text style={{ fontSize: 20 }}>🏥</Text>,
+          headerShown: false,
         }}
       />
       <Tab.Screen
