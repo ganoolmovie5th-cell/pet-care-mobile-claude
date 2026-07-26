@@ -21,7 +21,7 @@ export interface HealthRecord {
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
-export const createPet = async (pet: Omit<Pet, 'id' | 'created_at'>): Promise<string> => {
+export const createPet = async (pet: Omit<Pet, 'id' | 'createdAt'>): Promise<string> => {
   const response = await axios.post(`${apiBaseUrl}/health/pets`, pet);
   return response.data.id;
 };

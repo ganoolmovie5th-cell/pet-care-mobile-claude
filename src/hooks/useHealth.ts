@@ -7,7 +7,7 @@ interface UseHealthReturn {
   records: HealthRecord[];
   loading: boolean;
   error: string | null;
-  createNewPet: (pet: Omit<Pet, 'id' | 'created_at'>) => Promise<string | null>;
+  createNewPet: (pet: Omit<Pet, 'id' | 'createdAt'>) => Promise<string | null>;
   fetchPets: (ownerId: string) => Promise<void>;
   addRecord: (record: Omit<HealthRecord, 'id' | 'created_at'>) => Promise<string | null>;
   fetchRecords: (petId: string) => Promise<void>;
@@ -20,12 +20,12 @@ export const useHealth = (): UseHealthReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNewPet = useCallback(async (pet: Omit<Pet, 'id' | 'created_at'>): Promise<string | null> => {
+  const createNewPet = useCallback(async (pet: Omit<Pet, 'id' | 'createdAt'>): Promise<string | null> => {
     try {
       setLoading(true);
       setError(null);
       const petId = await createPet(pet);
-      setPets(prev => [...prev, { id: petId, ...pet, created_at: new Date().toISOString() }]);
+      setPets(prev => [...prev, { id: petId, ...pet, createdAt: new Date().toISOString() }]);
       return petId;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to create pet';
