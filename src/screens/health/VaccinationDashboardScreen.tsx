@@ -133,7 +133,7 @@ export default function VaccinationDashboardScreen({ route, navigation }: Props)
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>No vaccines found</Text>
               <Text style={styles.emptySubtext}>
-                Add vaccination records to track {schedule?.petName}'s health
+                Add vaccination records to track {schedule?.petName}&apos;s health
               </Text>
             </View>
           ) : null

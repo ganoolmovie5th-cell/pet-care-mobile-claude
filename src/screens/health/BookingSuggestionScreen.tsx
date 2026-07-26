@@ -76,7 +76,7 @@ export default function BookingSuggestionScreen({ route, navigation }: Props) {
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No Booking Suggestions</Text>
           <Text style={styles.emptySubtext}>
-            {pet?.name}'s vaccines are up to date. Great job keeping them healthy!
+            {pet?.name}&apos;s vaccines are up to date. Great job keeping them healthy!
           </Text>
         </View>
       </View>

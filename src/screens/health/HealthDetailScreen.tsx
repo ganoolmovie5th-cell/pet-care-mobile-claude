@@ -101,7 +101,7 @@ export const HealthDetailScreen: React.FC<HealthDetailScreenProps> = ({
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No records yet</Text>
           <Text style={styles.emptySubtext}>
-            Start tracking {petName}'s health with a record
+            Start tracking {petName}&apos;s health with a record
           </Text>
         </View>
       ) : (
