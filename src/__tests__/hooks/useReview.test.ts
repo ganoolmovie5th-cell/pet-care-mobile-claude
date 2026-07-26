@@ -11,7 +11,10 @@ describe('useReview Hook', () => {
 
   describe('createReview', () => {
     it('creates review and returns success', async () => {
-      (reviewService.createReview as jest.Mock).mockResolvedValue('review-123');
+      (reviewService.createReview as jest.Mock).mockResolvedValue({
+        id: 'review-123',
+        verified: true,
+      });
 
       const { result } = renderHook(() => useReview());
 

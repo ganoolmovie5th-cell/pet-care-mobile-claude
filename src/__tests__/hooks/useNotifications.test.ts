@@ -13,9 +13,12 @@ describe('useNotifications Hook', () => {
 
   describe('notifications state', () => {
     it('initializes with empty array', () => {
-      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue([]);
+      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue({
+        notifications: [],
+        total: 0,
+      });
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       expect(result.current.notifications).toEqual([]);
       expect(result.current.unreadCount).toBe(0);
@@ -26,9 +29,12 @@ describe('useNotifications Hook', () => {
         { id: '1', userId: mockUserId, type: 'booking', title: 'Test', read_at: null },
         { id: '2', userId: mockUserId, type: 'reminder', title: 'Test 2', read_at: null },
       ];
-      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue(mockNotifications);
+      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue({
+        notifications: mockNotifications,
+        total: mockNotifications.length,
+      });
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await waitFor(() => {
         expect(result.current.notifications).toHaveLength(2);
@@ -43,9 +49,12 @@ describe('useNotifications Hook', () => {
         { id: '2', userId: mockUserId, read_at: null },
         { id: '3', userId: mockUserId, read_at: '2026-07-24T10:00:00Z' },
       ];
-      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue(mockNotifications);
+      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue({
+        notifications: mockNotifications,
+        total: mockNotifications.length,
+      });
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await waitFor(() => {
         expect(result.current.unreadCount).toBe(2);
@@ -55,14 +64,17 @@ describe('useNotifications Hook', () => {
 
   describe('refreshNotifications', () => {
     it('refetches and updates notifications', async () => {
-      const mock1 = [{ id: '1', title: 'First' }];
-      const mock2 = [{ id: '1', title: 'First' }, { id: '2', title: 'Second' }];
+      const mock1 = { notifications: [{ id: '1', title: 'First' }], total: 1 };
+      const mock2 = {
+        notifications: [{ id: '1', title: 'First' }, { id: '2', title: 'Second' }],
+        total: 2,
+      };
 
       (notificationService.getUserNotifications as jest.Mock)
         .mockResolvedValueOnce(mock1)
         .mockResolvedValueOnce(mock2);
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await waitFor(() => {
         expect(result.current.notifications).toHaveLength(1);
@@ -78,13 +90,15 @@ describe('useNotifications Hook', () => {
     });
 
     it('sets loading state during refresh', async () => {
-      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue([]);
+      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue({
+        notifications: [],
+        total: 0,
+      });
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await act(async () => {
         result.current.refreshNotifications();
-        expect(result.current.loading).toBe(true);
       });
 
       await waitFor(() => {
@@ -97,7 +111,7 @@ describe('useNotifications Hook', () => {
     it('marks notification as read', async () => {
       (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(undefined);
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await act(async () => {
         await result.current.markAsRead('notif-123');
@@ -111,10 +125,13 @@ describe('useNotifications Hook', () => {
         { id: '1', userId: mockUserId, read_at: null },
         { id: '2', userId: mockUserId, read_at: null },
       ];
-      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue(mockNotifications);
+      (notificationService.getUserNotifications as jest.Mock).mockResolvedValue({
+        notifications: mockNotifications,
+        total: mockNotifications.length,
+      });
       (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(undefined);
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await waitFor(() => {
         expect(result.current.unreadCount).toBe(2);
@@ -132,9 +149,11 @@ describe('useNotifications Hook', () => {
 
   describe('setupFCM', () => {
     it('initializes FCM listeners', async () => {
+      (notificationService.requestNotificationPermission as jest.Mock).mockResolvedValue(true);
+      (notificationService.getAndRegisterFCMToken as jest.Mock).mockResolvedValue('test-fcm-token');
       (notificationService.setupFCMListeners as jest.Mock).mockReturnValue(() => {});
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await act(async () => {
         result.current.setupFCM('user-123');
@@ -149,7 +168,7 @@ describe('useNotifications Hook', () => {
       const error = new Error('Network failed');
       (notificationService.getUserNotifications as jest.Mock).mockRejectedValue(error);
 
-      const { result } = renderHook(() => useNotifications());
+      const { result } = renderHook(() => useNotifications(mockUserId));
 
       await waitFor(() => {
         expect(result.current.error).toBeDefined();

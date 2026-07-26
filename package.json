@@ -2,8 +2,9 @@
   "name": "pet-care-mobile",
   "version": "0.1.0",
   "description": "Pet Care Community MVP - React Native mobile app",
-  "main": "expo-app.json",
+  "main": "index.js",
   "scripts": {
+    "start": "expo start",
     "web": "expo start --web",
     "android": "expo start --android",
     "ios": "expo start --ios",
@@ -13,7 +14,7 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write src/",
-    "build": "expo build-web"
+    "build": "expo export"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.21.0",
