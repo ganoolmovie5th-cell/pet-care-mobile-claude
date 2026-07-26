@@ -1,8 +1,8 @@
 module.exports = {
   preset: 'jest-expo',
   testEnvironment: 'node',
-  // backend/ and admin/ are separate Node projects with their own jest configs
-  // and tsconfigs. Without this, jest-expo tries to run their suites too.
+  // Keep jest scoped to app code; without this the jest-expo preset walks the
+  // whole repo root.
   roots: ['<rootDir>/src', '<rootDir>/__tests__'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
