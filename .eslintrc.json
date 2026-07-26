@@ -27,5 +27,5 @@
     "no-unused-vars": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   },
-  "ignorePatterns": ["node_modules/", "dist/", "coverage/", "backend/", "admin/", "vet-dashboard/"]
+  "ignorePatterns": ["node_modules/", "dist/", "coverage/"]
 }
