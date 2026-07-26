@@ -6,14 +6,9 @@ import { AuthStack } from './AuthStack';
 import { HealthStack } from './HealthStack';
 import { PlaydateStack } from './PlaydateStack';
 import { VetStack } from './VetStack';
+import { ProfileScreen } from '../screens/profile/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
-
-const ProfileStackPlaceholder = () => (
-  <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-    <Text>My Profile (TBD)</Text>
-  </View>
-);
 
 const MainTabs = () => {
   return (
@@ -62,7 +57,7 @@ const MainTabs = () => {
       />
       <Tab.Screen
         name="ProfileTab"
-        component={ProfileStackPlaceholder}
+        component={ProfileScreen}
         options={{
           title: 'Profile',
           tabBarLabel: 'Profile',
