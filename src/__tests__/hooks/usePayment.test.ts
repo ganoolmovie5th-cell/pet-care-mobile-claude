@@ -41,7 +41,7 @@ describe('usePayment', () => {
     expect(paymentService.createInvoice).toHaveBeenCalledWith(
       'booking_1',
       150000,
-      'Konsultasi Bimo'
+      'Konsultasi Bimo',
     );
     expect(inv).toEqual(mockInvoice);
     expect(result.current.invoice?.invoice_url).toBe('https://checkout.example/inv_1');
@@ -50,7 +50,7 @@ describe('usePayment', () => {
 
   it('createNewInvoice returns null and records the error on failure', async () => {
     (paymentService.createInvoice as jest.Mock).mockRejectedValue(
-      new Error('Xendit menolak')
+      new Error('Xendit menolak'),
     );
 
     const { result } = renderHook(() => usePayment());
@@ -85,7 +85,7 @@ describe('usePayment', () => {
 
   it('checkStatus returns null and records the error on failure', async () => {
     (paymentService.getInvoiceStatus as jest.Mock).mockRejectedValue(
-      new Error('Invoice hilang')
+      new Error('Invoice hilang'),
     );
 
     const { result } = renderHook(() => usePayment());
@@ -119,7 +119,7 @@ describe('usePayment', () => {
 
   it('checkBookingPaymentStatus returns null and records the error on failure', async () => {
     (paymentService.checkPaymentStatus as jest.Mock).mockRejectedValue(
-      new Error('Booking tidak ada')
+      new Error('Booking tidak ada'),
     );
 
     const { result } = renderHook(() => usePayment());

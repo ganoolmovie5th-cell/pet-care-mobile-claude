@@ -1,9 +1,4 @@
-import {
-  ConfirmationResult,
-  User,
-  signOut,
-  onAuthStateChanged,
-} from 'firebase/auth';
+import { ConfirmationResult, User, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
 import axios from 'axios';
 

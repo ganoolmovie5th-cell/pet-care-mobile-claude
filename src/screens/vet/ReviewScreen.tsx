@@ -74,7 +74,7 @@ const ReviewScreen: React.FC<ReviewScreenProps> = ({
 
         {/* Star Rating */}
         <View style={styles.ratingContainer}>
-          {[1, 2, 3, 4, 5].map(star => (
+          {[1, 2, 3, 4, 5].map((star) => (
             <TouchableOpacity
               key={star}
               onPress={() => setRating(star)}
@@ -84,7 +84,9 @@ const ReviewScreen: React.FC<ReviewScreenProps> = ({
             </TouchableOpacity>
           ))}
         </View>
-        <Text style={styles.ratingLabel}>{rating > 0 ? `${rating} / 5 stars` : 'Select rating'}</Text>
+        <Text style={styles.ratingLabel}>
+          {rating > 0 ? `${rating} / 5 stars` : 'Select rating'}
+        </Text>
 
         {/* Review Text */}
         <Text style={styles.label}>Tell us more (optional)</Text>

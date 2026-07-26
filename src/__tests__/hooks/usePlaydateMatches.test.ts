@@ -39,7 +39,7 @@ describe('usePlaydateMatches', () => {
       LNG,
       'pet_1',
       5,
-      'score'
+      'score',
     );
     expect(result.current.matches[0].petName).toBe('Coklat');
     expect(result.current.loading).toBe(false);
@@ -56,8 +56,8 @@ describe('usePlaydateMatches', () => {
         LNG,
         'pet_1',
         20,
-        'recent'
-      )
+        'recent',
+      ),
     );
   });
 
@@ -67,7 +67,7 @@ describe('usePlaydateMatches', () => {
     ['petId null', LAT, LNG, null],
   ])('skips the request when %s', async (_label, lat, lng, petId) => {
     const { result } = renderHook(() =>
-      usePlaydateMatches(lat as any, lng as any, petId as any)
+      usePlaydateMatches(lat as any, lng as any, petId as any),
     );
 
     await act(async () => {

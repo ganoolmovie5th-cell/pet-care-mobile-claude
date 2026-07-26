@@ -61,10 +61,7 @@ export const HealthDetailScreen: React.FC<HealthDetailScreenProps> = ({
         <Text style={styles.subtitle}>Health Records</Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => onAddRecord(petId)}
-      >
+      <TouchableOpacity style={styles.addButton} onPress={() => onAddRecord(petId)}>
         <Text style={styles.addButtonText}>+ Add Record</Text>
       </TouchableOpacity>
 

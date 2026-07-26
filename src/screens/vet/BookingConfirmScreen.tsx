@@ -45,7 +45,7 @@ export const BookingConfirmScreen: React.FC<BookingConfirmScreenProps> = ({
     const inv = await createNewInvoice(
       bookingId,
       amount,
-      `Booking at ${vetClinicName} for ${petName}`
+      `Booking at ${vetClinicName} for ${petName}`,
     );
 
     if (inv) {
@@ -144,9 +144,7 @@ export const BookingConfirmScreen: React.FC<BookingConfirmScreenProps> = ({
             <Text style={styles.payButtonText}>Open Payment</Text>
           </TouchableOpacity>
 
-          <Text style={styles.statusText}>
-            Status: {invoice.status}
-          </Text>
+          <Text style={styles.statusText}>Status: {invoice.status}</Text>
         </View>
       )}
 

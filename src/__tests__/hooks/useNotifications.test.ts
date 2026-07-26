@@ -66,7 +66,10 @@ describe('useNotifications Hook', () => {
     it('refetches and updates notifications', async () => {
       const mock1 = { notifications: [{ id: '1', title: 'First' }], total: 1 };
       const mock2 = {
-        notifications: [{ id: '1', title: 'First' }, { id: '2', title: 'Second' }],
+        notifications: [
+          { id: '1', title: 'First' },
+          { id: '2', title: 'Second' },
+        ],
         total: 2,
       };
 
@@ -109,7 +112,9 @@ describe('useNotifications Hook', () => {
 
   describe('markAsRead', () => {
     it('marks notification as read', async () => {
-      (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(undefined);
+      (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       const { result } = renderHook(() => useNotifications(mockUserId));
 
@@ -117,7 +122,9 @@ describe('useNotifications Hook', () => {
         await result.current.markAsRead('notif-123');
       });
 
-      expect(notificationService.markNotificationAsRead).toHaveBeenCalledWith('notif-123');
+      expect(notificationService.markNotificationAsRead).toHaveBeenCalledWith(
+        'notif-123',
+      );
     });
 
     it('updates unreadCount after marking as read', async () => {
@@ -129,7 +136,9 @@ describe('useNotifications Hook', () => {
         notifications: mockNotifications,
         total: mockNotifications.length,
       });
-      (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(undefined);
+      (notificationService.markNotificationAsRead as jest.Mock).mockResolvedValue(
+        undefined,
+      );
 
       const { result } = renderHook(() => useNotifications(mockUserId));
 
@@ -149,8 +158,12 @@ describe('useNotifications Hook', () => {
 
   describe('setupFCM', () => {
     it('initializes FCM listeners', async () => {
-      (notificationService.requestNotificationPermission as jest.Mock).mockResolvedValue(true);
-      (notificationService.getAndRegisterFCMToken as jest.Mock).mockResolvedValue('test-fcm-token');
+      (notificationService.requestNotificationPermission as jest.Mock).mockResolvedValue(
+        true,
+      );
+      (notificationService.getAndRegisterFCMToken as jest.Mock).mockResolvedValue(
+        'test-fcm-token',
+      );
       (notificationService.setupFCMListeners as jest.Mock).mockReturnValue(() => {});
 
       const { result } = renderHook(() => useNotifications(mockUserId));

@@ -27,9 +27,7 @@ interface GroupedVaccines {
 
 const groupVaccinesByStatus = (vaccines: Vaccine[]): GroupedVaccines => {
   return {
-    upToDate: vaccines.filter(
-      (v) => v.status === 'completed' && v.lastDate
-    ),
+    upToDate: vaccines.filter((v) => v.status === 'completed' && v.lastDate),
     dueSoon: vaccines.filter((v) => v.status === 'due_soon'),
     overdue: vaccines.filter((v) => v.status === 'overdue'),
     upcoming: vaccines.filter((v) => v.status === 'upcoming'),
@@ -120,11 +118,7 @@ export default function VaccinationDashboardScreen({ route }: Props) {
         renderItem={({ item }) => renderSection(item)}
         scrollEnabled
         refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={refetch}
-            tintColor="#0f5c4a"
-          />
+          <RefreshControl refreshing={loading} onRefresh={refetch} tintColor="#0f5c4a" />
         }
         contentContainerStyle={emptyState ? styles.emptyContainer : undefined}
         ListEmptyComponent={

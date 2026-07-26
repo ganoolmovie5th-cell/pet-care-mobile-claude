@@ -13,7 +13,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 
 export function memoizeAsync<Args extends any[], Return>(
   fn: (...args: Args) => Promise<Return>,
-  keyGenerator: (...args: Args) => string
+  keyGenerator: (...args: Args) => string,
 ) {
   const cache = new Map<string, Promise<Return>>();
 
@@ -36,7 +36,11 @@ export function memoizeAsync<Args extends any[], Return>(
   };
 }
 
-export function optimizeImage(url: string, width: number = 300, quality: number = 80): string {
+export function optimizeImage(
+  url: string,
+  width: number = 300,
+  quality: number = 80,
+): string {
   if (!url) return '';
 
   const params = new URLSearchParams();
@@ -46,8 +50,6 @@ export function optimizeImage(url: string, width: number = 300, quality: number 
   return `${url}?${params.toString()}`;
 }
 
-export function useMemorizedList<T>(
-  items: T[]
-) {
+export function useMemorizedList<T>(items: T[]) {
   return useMemo(() => items, [items, items.length]);
 }

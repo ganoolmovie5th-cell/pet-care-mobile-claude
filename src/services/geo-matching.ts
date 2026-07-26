@@ -27,7 +27,7 @@ export const getPlaydateMatches = async (
   lng: number,
   petId: string,
   radiusKm: number = 5,
-  sort: 'score' | 'recent' = 'score'
+  sort: 'score' | 'recent' = 'score',
 ): Promise<PlaydateMatchesResponse> => {
   const response = await api.get('/playdate/matches', {
     params: {

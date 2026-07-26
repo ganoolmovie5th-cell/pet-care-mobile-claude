@@ -11,7 +11,7 @@ export interface InsuranceClick {
 
 export const trackInsuranceClick = async (
   userId: string,
-  providerName: string
+  providerName: string,
 ): Promise<void> => {
   try {
     await axios.post(`${apiBaseUrl}/analytics/insurance-click`, {

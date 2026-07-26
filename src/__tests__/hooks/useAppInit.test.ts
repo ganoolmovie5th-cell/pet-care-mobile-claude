@@ -54,7 +54,7 @@ describe('useAppInit', () => {
 
     expect(result.current.queueSize).toBe(0);
     expect(sentry.addBreadcrumb).not.toHaveBeenCalledWith(
-      expect.stringContaining('Offline queue has')
+      expect.stringContaining('Offline queue has'),
     );
   });
 
@@ -122,14 +122,14 @@ describe('useAppInit', () => {
 
     expect(sentry.addBreadcrumb).toHaveBeenCalledWith(
       'Sync complete: 2 synced, 1 failed',
-      'warning'
+      'warning',
     );
   });
 
   it('swallows a sync failure into an error breadcrumb', async () => {
     (offlineService.getQueueSize as jest.Mock).mockResolvedValue(1);
     (offlineService.processSyncQueue as jest.Mock).mockRejectedValue(
-      new Error('Backend mati')
+      new Error('Backend mati'),
     );
 
     const { result } = renderHook(() => useAppInit());
@@ -141,7 +141,7 @@ describe('useAppInit', () => {
 
     expect(sentry.addBreadcrumb).toHaveBeenCalledWith(
       'Sync failed: Backend mati',
-      'error'
+      'error',
     );
     expect(result.current.syncing).toBe(false);
   });

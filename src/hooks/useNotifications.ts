@@ -31,7 +31,7 @@ export const useNotifications = (userId?: string): UseNotificationsReturn => {
     try {
       const response = await getUserNotifications(userId, false, 50, 0);
       setNotifications(response.notifications);
-      const unread = response.notifications.filter(n => !n.read_at).length;
+      const unread = response.notifications.filter((n) => !n.read_at).length;
       setUnreadCount(unread);
       setError(null);
     } catch (err) {
@@ -41,22 +41,19 @@ export const useNotifications = (userId?: string): UseNotificationsReturn => {
     }
   }, [userId]);
 
-  const markAsRead = useCallback(
-    async (notificationId: string) => {
-      try {
-        await markNotificationAsRead(notificationId);
-        setNotifications(prev =>
-          prev.map(n =>
-            n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n
-          )
-        );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      } catch (err) {
-        console.error('Error marking notification as read:', err);
-      }
-    },
-    []
-  );
+  const markAsRead = useCallback(async (notificationId: string) => {
+    try {
+      await markNotificationAsRead(notificationId);
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId ? { ...n, read_at: new Date().toISOString() } : n,
+        ),
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (err) {
+      console.error('Error marking notification as read:', err);
+    }
+  }, []);
 
   const setupFCM = useCallback(
     async (uid: string) => {
@@ -74,19 +71,19 @@ export const useNotifications = (userId?: string): UseNotificationsReturn => {
 
         // Setup listeners
         setupFCMListeners(
-          message => {
+          (message) => {
             console.log('Foreground notification:', message);
             refreshNotifications();
           },
-          message => {
+          (message) => {
             console.log('Background notification:', message);
-          }
+          },
         );
       } catch (err) {
         console.error('Error setting up FCM:', err);
       }
     },
-    [refreshNotifications]
+    [refreshNotifications],
   );
 
   useEffect(() => {

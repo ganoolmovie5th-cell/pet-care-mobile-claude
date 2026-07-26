@@ -150,7 +150,7 @@ export const EditPetProfileScreen: React.FC<EditPetProfileScreenProps> = ({
     } catch (err) {
       Alert.alert(
         'Error',
-        err instanceof Error ? err.message : 'Failed to update pet profile'
+        err instanceof Error ? err.message : 'Failed to update pet profile',
       );
     } finally {
       setSubmitting(false);
@@ -185,11 +185,7 @@ export const EditPetProfileScreen: React.FC<EditPetProfileScreenProps> = ({
       <View style={styles.section}>
         <Text style={styles.label}>Breed *</Text>
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={breed}
-            onValueChange={setBreed}
-            style={styles.picker}
-          >
+          <Picker selectedValue={breed} onValueChange={setBreed} style={styles.picker}>
             <Picker.Item label="Select breed..." value="" />
             {commonBreeds.map((b) => (
               <Picker.Item key={b} label={b} value={b} />
@@ -245,9 +241,7 @@ export const EditPetProfileScreen: React.FC<EditPetProfileScreenProps> = ({
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={bloodType}
-            onValueChange={(value) =>
-              setBloodType(value as 'A' | 'B' | 'AB' | 'O')
-            }
+            onValueChange={(value) => setBloodType(value as 'A' | 'B' | 'AB' | 'O')}
             style={styles.picker}
           >
             <Picker.Item label="A" value="A" />
@@ -293,10 +287,7 @@ export const EditPetProfileScreen: React.FC<EditPetProfileScreenProps> = ({
             onChangeText={setAllergyInput}
             placeholderTextColor="#aaa"
           />
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddAllergy}
-          >
+          <TouchableOpacity style={styles.addButton} onPress={handleAddAllergy}>
             <Text style={styles.addButtonText}>Add</Text>
           </TouchableOpacity>
         </View>

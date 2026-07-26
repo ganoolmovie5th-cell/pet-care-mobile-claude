@@ -6,7 +6,10 @@ import { RootNavigator } from './navigation/RootNavigator';
 import { useAppInit } from './hooks/useAppInit';
 import { useAuth } from './hooks/useAuth';
 import { useNotifications } from './hooks/useNotifications';
-import { requestNotificationPermission, getAndRegisterFCMToken } from './services/notifications';
+import {
+  requestNotificationPermission,
+  getAndRegisterFCMToken,
+} from './services/notifications';
 
 function AppContent() {
   const { user } = useAuth();
@@ -22,7 +25,7 @@ function AppContent() {
         if (hasPermission) {
           await getAndRegisterFCMToken(
             user.uid,
-            Platform.OS === 'ios' ? 'iOS' : 'Android'
+            Platform.OS === 'ios' ? 'iOS' : 'Android',
           );
           setupFCM(user.uid);
         }

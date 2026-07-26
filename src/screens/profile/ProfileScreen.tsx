@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { useAuth } from '../../hooks/useAuth';
 import { logout } from '../../services/auth';
 
@@ -21,7 +28,10 @@ export const ProfileScreen = () => {
             await logout();
           } catch (err) {
             setSigningOut(false);
-            Alert.alert('Gagal keluar', err instanceof Error ? err.message : 'Coba lagi.');
+            Alert.alert(
+              'Gagal keluar',
+              err instanceof Error ? err.message : 'Coba lagi.',
+            );
           }
         },
       },
@@ -35,7 +45,11 @@ export const ProfileScreen = () => {
         <Text style={styles.detail}>{user?.phoneNumber || user?.email || '-'}</Text>
       </View>
 
-      <TouchableOpacity style={styles.logout} onPress={handleLogout} disabled={signingOut}>
+      <TouchableOpacity
+        style={styles.logout}
+        onPress={handleLogout}
+        disabled={signingOut}
+      >
         {signingOut ? (
           <ActivityIndicator color="#fff" />
         ) : (

@@ -21,15 +21,20 @@ export interface NotificationsResponse {
 export const requestNotificationPermission = async (): Promise<boolean> => {
   try {
     const permission = await messaging().requestPermission();
-    return permission === messaging.AuthorizationStatus.AUTHORIZED ||
-           permission === messaging.AuthorizationStatus.PROVISIONAL;
+    return (
+      permission === messaging.AuthorizationStatus.AUTHORIZED ||
+      permission === messaging.AuthorizationStatus.PROVISIONAL
+    );
   } catch (error) {
     console.error('Error requesting notification permission:', error);
     return false;
   }
 };
 
-export const getAndRegisterFCMToken = async (userId: string, device: 'iOS' | 'Android'): Promise<string> => {
+export const getAndRegisterFCMToken = async (
+  userId: string,
+  device: 'iOS' | 'Android',
+): Promise<string> => {
   try {
     const token = await messaging().getToken();
     await api.post('/fcm/register-token', {
@@ -48,7 +53,7 @@ export const getUserNotifications = async (
   userId: string,
   unreadOnly: boolean = false,
   limit: number = 20,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<NotificationsResponse> => {
   const response = await api.get('/fcm/notifications', {
     params: {
@@ -67,10 +72,10 @@ export const markNotificationAsRead = async (notificationId: string): Promise<vo
 
 export const setupFCMListeners = (
   onMessage: (notification: any) => void,
-  onBackgroundMessage?: (notification: any) => void
+  onBackgroundMessage?: (notification: any) => void,
 ): (() => void) => {
   // Foreground message handler
-  const unsubscribeForeground = messaging().onMessage(remoteMessage => {
+  const unsubscribeForeground = messaging().onMessage((remoteMessage) => {
     if (remoteMessage.notification) {
       onMessage(remoteMessage);
     }
@@ -78,7 +83,7 @@ export const setupFCMListeners = (
 
   // Background message handler (optional)
   if (onBackgroundMessage) {
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
+    messaging().setBackgroundMessageHandler(async (remoteMessage) => {
       onBackgroundMessage(remoteMessage);
     });
   }

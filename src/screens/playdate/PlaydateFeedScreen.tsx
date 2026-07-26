@@ -26,13 +26,11 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
   const [showMatches, setShowMatches] = useState(true);
 
   // Use geo-matching if location available, else fallback to all posts
-  const { matches, loading: matchLoading, refresh: refreshMatches } = usePlaydateMatches(
-    location?.lat || null,
-    location?.lng || null,
-    null,
-    5,
-    'score'
-  );
+  const {
+    matches,
+    loading: matchLoading,
+    refresh: refreshMatches,
+  } = usePlaydateMatches(location?.lat || null, location?.lng || null, null, 5, 'score');
   const { posts, loading: postsLoading, error: postsError, refetch } = usePlaydatePosts();
 
   const displayPosts = showMatches && location && matches.length > 0 ? matches : posts;
@@ -89,7 +87,7 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
       ) : (
         <FlatList<any>
           data={displayPosts}
-          keyExtractor={item => item.id || item.postId}
+          keyExtractor={(item) => item.id || item.postId}
           renderItem={({ item }) => (
             <View>
               <PostCard

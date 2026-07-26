@@ -5,7 +5,9 @@ interface UseBookingReturn {
   bookings: Booking[];
   loading: boolean;
   error: string | null;
-  createNewBooking: (booking: Omit<Booking, 'id' | 'created_at'>) => Promise<string | null>;
+  createNewBooking: (
+    booking: Omit<Booking, 'id' | 'created_at'>,
+  ) => Promise<string | null>;
   fetchBookings: (ownerId: string) => Promise<void>;
 }
 
@@ -29,7 +31,7 @@ export const useBooking = (): UseBookingReturn => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   const fetchBookings = useCallback(async (ownerId: string) => {

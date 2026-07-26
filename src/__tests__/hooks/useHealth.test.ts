@@ -171,7 +171,7 @@ describe('useVaccinationSchedule', () => {
 
   it('records the error and leaves schedule null', async () => {
     (healthService.getVaccinationSchedule as jest.Mock).mockRejectedValue(
-      new Error('Pet tidak ditemukan')
+      new Error('Pet tidak ditemukan'),
     );
 
     const { result } = renderHook(() => useVaccinationSchedule('pet_missing'));
@@ -233,7 +233,7 @@ describe('useReminderPreferences', () => {
   it('updatePrefs rethrows so the screen can react', async () => {
     (healthService.getReminderPreferences as jest.Mock).mockResolvedValue(mockPrefs);
     (healthService.updateReminderPreferences as jest.Mock).mockRejectedValue(
-      new Error('Gagal simpan')
+      new Error('Gagal simpan'),
     );
 
     const { result } = renderHook(() => useReminderPreferences());
@@ -241,7 +241,7 @@ describe('useReminderPreferences', () => {
 
     await act(async () => {
       await expect(result.current.updatePrefs({ pushEnabled: true })).rejects.toThrow(
-        'Gagal simpan'
+        'Gagal simpan',
       );
     });
 
@@ -269,7 +269,7 @@ describe('useBookingSuggestions', () => {
 
   it('keeps suggestions empty on failure', async () => {
     (healthService.getBookingSuggestions as jest.Mock).mockRejectedValue(
-      new Error('Backend mati')
+      new Error('Backend mati'),
     );
 
     const { result } = renderHook(() => useBookingSuggestions('pet_1'));

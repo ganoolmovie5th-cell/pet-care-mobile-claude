@@ -34,7 +34,9 @@ describe('useReview Hook', () => {
     });
 
     it('handles errors during review creation', async () => {
-      (reviewService.createReview as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (reviewService.createReview as jest.Mock).mockRejectedValue(
+        new Error('Network error'),
+      );
 
       const { result } = renderHook(() => useReview());
 
@@ -46,7 +48,7 @@ describe('useReview Hook', () => {
             rating: 5,
             text: 'Great!',
           });
-        })
+        }),
       ).rejects.toThrow('Network error');
     });
   });
@@ -67,7 +69,13 @@ describe('useReview Hook', () => {
       });
 
       expect(reviews).toEqual(mockReviews);
-      expect(reviewService.getReviewsForTarget).toHaveBeenCalledWith('vet-456', 'vet', 'recent', 10, 0);
+      expect(reviewService.getReviewsForTarget).toHaveBeenCalledWith(
+        'vet-456',
+        'vet',
+        'recent',
+        10,
+        0,
+      );
     });
 
     it('returns empty array when no reviews', async () => {

@@ -17,7 +17,7 @@ export interface Invoice {
 export const createInvoice = async (
   bookingId: string,
   amount: number,
-  description: string
+  description: string,
 ): Promise<Invoice> => {
   const response = await axios.post(`${apiBaseUrl}/payments/create-invoice`, {
     bookingId,
@@ -32,7 +32,9 @@ export const getInvoiceStatus = async (invoiceId: string): Promise<Invoice> => {
   return response.data;
 };
 
-export const checkPaymentStatus = async (bookingId: string): Promise<{ status: string; paidAt?: string }> => {
+export const checkPaymentStatus = async (
+  bookingId: string,
+): Promise<{ status: string; paidAt?: string }> => {
   const response = await axios.get(`${apiBaseUrl}/payments/booking/${bookingId}/status`);
   return response.data;
 };

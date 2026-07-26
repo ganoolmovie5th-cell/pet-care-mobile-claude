@@ -55,7 +55,9 @@ export const RecordCard: React.FC<RecordCardProps> = ({
       <View style={styles.footer}>
         {vetName && <Text style={styles.vet}>Vet: {vetName}</Text>}
         {nextDueDate && (
-          <Text style={isOverdue ? [styles.nextDue, styles.overdueBadge] : styles.nextDue}>
+          <Text
+            style={isOverdue ? [styles.nextDue, styles.overdueBadge] : styles.nextDue}
+          >
             Next: {formatDate(nextDueDate)}
           </Text>
         )}

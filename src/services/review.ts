@@ -36,7 +36,7 @@ export const createReview = async (
   type: 'vet' | 'owner',
   rating: number,
   text?: string,
-  bookingId?: string
+  bookingId?: string,
 ): Promise<{ id: string; verified: boolean }> => {
   const response = await api.post('/reviews', {
     reviewerId,
@@ -54,7 +54,7 @@ export const getReviewsForTarget = async (
   type: 'vet' | 'owner' = 'vet',
   sort: 'recent' | 'helpful' | 'rating' = 'recent',
   limit: number = 10,
-  offset: number = 0
+  offset: number = 0,
 ): Promise<ReviewsResponse> => {
   const response = await api.get(`/reviews/${targetId}`, {
     params: { type, sort, limit, offset },

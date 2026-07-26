@@ -7,21 +7,24 @@ export function usePayment() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNewInvoice = useCallback(async (bookingId: string, amount: number, description: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const inv = await createInvoice(bookingId, amount, description);
-      setInvoice(inv);
-      return inv;
-    } catch (err) {
-      const errMsg = err instanceof Error ? err.message : 'Failed to create invoice';
-      setError(errMsg);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createNewInvoice = useCallback(
+    async (bookingId: string, amount: number, description: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const inv = await createInvoice(bookingId, amount, description);
+        setInvoice(inv);
+        return inv;
+      } catch (err) {
+        const errMsg = err instanceof Error ? err.message : 'Failed to create invoice';
+        setError(errMsg);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const checkStatus = useCallback(async (invoiceId: string) => {
     try {

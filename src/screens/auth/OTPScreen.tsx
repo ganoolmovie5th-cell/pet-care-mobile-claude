@@ -21,7 +21,10 @@ export const OTPScreen: React.FC<OTPScreenProps> = ({ onOTPVerified }) => {
       await verifyOTP(otp);
       onOTPVerified();
     } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to verify OTP');
+      Alert.alert(
+        'Error',
+        error instanceof Error ? error.message : 'Failed to verify OTP',
+      );
     } finally {
       setLoading(false);
     }
@@ -40,14 +43,12 @@ export const OTPScreen: React.FC<OTPScreenProps> = ({ onOTPVerified }) => {
         onChangeText={setOtp}
         editable={!loading}
       />
-      <TouchableOpacity 
-        style={[styles.button, loading && styles.buttonDisabled]} 
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleVerifyOTP}
         disabled={loading}
       >
-        <Text style={styles.buttonText}>
-          {loading ? 'Verifying...' : 'Verify OTP'}
-        </Text>
+        <Text style={styles.buttonText}>{loading ? 'Verifying...' : 'Verify OTP'}</Text>
       </TouchableOpacity>
     </View>
   );

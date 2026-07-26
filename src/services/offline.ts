@@ -16,7 +16,7 @@ const MAX_RETRIES = 5;
 export async function enqueueMutation(
   endpoint: string,
   method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-  payload: any
+  payload: any,
 ): Promise<string> {
   const mutation: QueuedMutation = {
     id: `mutation_${Date.now()}_${Math.random()}`,

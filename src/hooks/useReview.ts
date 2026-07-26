@@ -1,5 +1,9 @@
 import { useState } from 'react';
-import { createReview as createReviewAPI, getReviewsForTarget, markReviewHelpful } from '../services/review';
+import {
+  createReview as createReviewAPI,
+  getReviewsForTarget,
+  markReviewHelpful,
+} from '../services/review';
 
 export const useReview = () => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +25,7 @@ export const useReview = () => {
         'vet',
         data.rating,
         data.text,
-        data.bookingId
+        data.bookingId,
       );
       return result.id;
     } catch (err) {
@@ -37,7 +41,7 @@ export const useReview = () => {
     vetId: string,
     sort: 'recent' | 'helpful' | 'rating' = 'recent',
     limit: number = 10,
-    offset: number = 0
+    offset: number = 0,
   ) => {
     try {
       setLoading(true);

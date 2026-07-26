@@ -16,7 +16,7 @@ export const getRecommendedVets = async (
   lat: number,
   lng: number,
   petId: string,
-  limit: number = 10
+  limit: number = 10,
 ): Promise<RecommendationsResponse> => {
   const response = await api.get('/recommendations/vets', {
     params: {

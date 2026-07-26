@@ -16,12 +16,11 @@ interface AddRecordScreenProps {
   onSave: () => void;
 }
 
-export const AddRecordScreen: React.FC<AddRecordScreenProps> = ({
-  petId,
-  onSave,
-}) => {
+export const AddRecordScreen: React.FC<AddRecordScreenProps> = ({ petId, onSave }) => {
   const { addRecord, loading } = useHealth();
-  const [type, setType] = useState<'vaksin' | 'checkup' | 'medication' | 'surgery'>('vaksin');
+  const [type, setType] = useState<'vaksin' | 'checkup' | 'medication' | 'surgery'>(
+    'vaksin',
+  );
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [note, setNote] = useState('');
   const [vetName, setVetName] = useState('');
@@ -66,19 +65,19 @@ export const AddRecordScreen: React.FC<AddRecordScreenProps> = ({
           {(['vaksin', 'checkup', 'medication', 'surgery'] as const).map((t) => (
             <TouchableOpacity
               key={t}
-              style={[
-                styles.typeButton,
-                type === t && styles.typeButtonActive,
-              ]}
+              style={[styles.typeButton, type === t && styles.typeButtonActive]}
               onPress={() => setType(t)}
             >
               <Text
-                style={[
-                  styles.typeButtonText,
-                  type === t && styles.typeButtonTextActive,
-                ]}
+                style={[styles.typeButtonText, type === t && styles.typeButtonTextActive]}
               >
-                {t === 'vaksin' ? 'Vaccination' : t === 'checkup' ? 'Check-up' : t === 'medication' ? 'Medication' : 'Surgery'}
+                {t === 'vaksin'
+                  ? 'Vaccination'
+                  : t === 'checkup'
+                    ? 'Check-up'
+                    : t === 'medication'
+                      ? 'Medication'
+                      : 'Surgery'}
               </Text>
             </TouchableOpacity>
           ))}

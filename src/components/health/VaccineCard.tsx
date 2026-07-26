@@ -29,7 +29,9 @@ export const VaccineCard: React.FC<VaccineCardProps> = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(
-    vaccine.nextDueDate ? format(new Date(vaccine.nextDueDate), 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd')
+    vaccine.nextDueDate
+      ? format(new Date(vaccine.nextDueDate), 'yyyy-MM-dd')
+      : format(new Date(), 'yyyy-MM-dd'),
   );
   const [vetName, setVetName] = useState('');
   const [notes, setNotes] = useState('');
@@ -43,13 +45,7 @@ export const VaccineCard: React.FC<VaccineCardProps> = ({
 
     try {
       setSubmitting(true);
-      await markVaccineComplete(
-        scheduleId,
-        vaccine.id,
-        selectedDate,
-        vetName,
-        notes
-      );
+      await markVaccineComplete(scheduleId, vaccine.id, selectedDate, vetName, notes);
 
       setModalVisible(false);
       setVetName('');
@@ -58,7 +54,8 @@ export const VaccineCard: React.FC<VaccineCardProps> = ({
 
       Alert.alert('Success', `${vaccine.name} marked as completed`);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to mark vaccine complete';
+      const message =
+        err instanceof Error ? err.message : 'Failed to mark vaccine complete';
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);
@@ -119,12 +116,7 @@ export const VaccineCard: React.FC<VaccineCardProps> = ({
             </View>
           </View>
 
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: getStatusColor() },
-            ]}
-          >
+          <View style={[styles.badge, { backgroundColor: getStatusColor() }]}>
             <Text style={styles.badgeText}>{getStatusLabel()}</Text>
           </View>
         </View>
@@ -139,11 +131,7 @@ export const VaccineCard: React.FC<VaccineCardProps> = ({
         )}
       </View>
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-      >
+      <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>

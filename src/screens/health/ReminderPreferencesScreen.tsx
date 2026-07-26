@@ -71,7 +71,7 @@ export default function ReminderPreferencesScreen(_props: Props) {
     } catch (err) {
       Alert.alert(
         'Error',
-        err instanceof Error ? err.message : 'Failed to save preferences'
+        err instanceof Error ? err.message : 'Failed to save preferences',
       );
     } finally {
       setUpdating(false);
@@ -150,10 +150,7 @@ export default function ReminderPreferencesScreen(_props: Props) {
           {[1, 7, 14, 21, 30].map((day) => (
             <TouchableOpacity
               key={day}
-              style={[
-                styles.dayButton,
-                reminderDays === day && styles.dayButtonActive,
-              ]}
+              style={[styles.dayButton, reminderDays === day && styles.dayButtonActive]}
               onPress={() => handleChangeDays(day)}
               disabled={updating}
             >
@@ -193,8 +190,7 @@ export default function ReminderPreferencesScreen(_props: Props) {
               <View
                 style={[
                   styles.checkbox,
-                  mutedVaccines.includes(vaccine.id) &&
-                    styles.checkboxActive,
+                  mutedVaccines.includes(vaccine.id) && styles.checkboxActive,
                 ]}
               >
                 {mutedVaccines.includes(vaccine.id) && (

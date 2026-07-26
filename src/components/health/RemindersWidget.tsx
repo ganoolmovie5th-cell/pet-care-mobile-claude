@@ -3,13 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 
 interface RemindersWidgetProps {
   totalRecords: number;
-  overduCount: number;
+  overdueCount: number;
   upcomingCount: number;
 }
 
 export const RemindersWidget: React.FC<RemindersWidgetProps> = ({
   totalRecords: _totalRecords,
-  overduCount,
+  overdueCount,
   upcomingCount,
 }) => {
   return (
@@ -17,9 +17,9 @@ export const RemindersWidget: React.FC<RemindersWidgetProps> = ({
       <View style={styles.badge}>
         <Text style={styles.badgeTitle}>Health Reminders</Text>
         <View style={styles.stats}>
-          {overduCount > 0 && (
+          {overdueCount > 0 && (
             <View style={styles.stat}>
-              <Text style={styles.overdueBadge}>{overduCount}</Text>
+              <Text style={styles.overdueBadge}>{overdueCount}</Text>
               <Text style={styles.statLabel}>Overdue</Text>
             </View>
           )}
@@ -29,7 +29,7 @@ export const RemindersWidget: React.FC<RemindersWidgetProps> = ({
               <Text style={styles.statLabel}>Due Soon</Text>
             </View>
           )}
-          {overduCount === 0 && upcomingCount === 0 && (
+          {overdueCount === 0 && upcomingCount === 0 && (
             <Text style={styles.allClear}>✓ All caught up!</Text>
           )}
         </View>

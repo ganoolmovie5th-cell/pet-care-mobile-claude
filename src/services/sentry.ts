@@ -23,7 +23,10 @@ export const captureException = (error: Error, context?: Record<string, any>) =>
   });
 };
 
-export const captureMessage = (message: string, level: 'info' | 'warning' | 'error' = 'info') => {
+export const captureMessage = (
+  message: string,
+  level: 'info' | 'warning' | 'error' = 'info',
+) => {
   Sentry.captureMessage(message, level);
 };
 
@@ -39,7 +42,10 @@ export const clearUser = () => {
   Sentry.setUser(null);
 };
 
-export const addBreadcrumb = (message: string, level: 'info' | 'warning' | 'error' = 'info') => {
+export const addBreadcrumb = (
+  message: string,
+  level: 'info' | 'warning' | 'error' = 'info',
+) => {
   Sentry.addBreadcrumb({
     message,
     level,

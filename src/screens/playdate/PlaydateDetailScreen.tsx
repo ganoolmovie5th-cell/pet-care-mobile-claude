@@ -17,7 +17,10 @@ interface PlaydateDetailScreenProps {
   onChat: (chatId: string) => void;
 }
 
-export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post, onChat }) => {
+export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({
+  post,
+  onChat,
+}) => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +32,11 @@ export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post
 
     try {
       setLoading(true);
-      const chat = await createPlaydateChat(post.id, interestedOwnerId, `Hi! I'm interested in your playdate!`);
+      const chat = await createPlaydateChat(
+        post.id,
+        interestedOwnerId,
+        `Hi! I'm interested in your playdate!`,
+      );
       onChat(chat.id);
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'Failed to start chat');
@@ -49,9 +56,7 @@ export const PlaydateDetailScreen: React.FC<PlaydateDetailScreenProps> = ({ post
         <Text style={styles.sectionTitle}>Details</Text>
         <View style={styles.detail}>
           <Text style={styles.label}>Location:</Text>
-          <Text style={styles.value}>
-            {post.location.address || 'Not specified'}
-          </Text>
+          <Text style={styles.value}>{post.location.address || 'Not specified'}</Text>
         </View>
         <View style={styles.detail}>
           <Text style={styles.label}>Date:</Text>

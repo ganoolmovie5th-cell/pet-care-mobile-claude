@@ -28,10 +28,7 @@ export const PlaydateStack = () => {
         },
       }}
     >
-      <Stack.Screen
-        name="Feed"
-        options={{ title: 'Playdates' }}
-      >
+      <Stack.Screen name="Feed" options={{ title: 'Playdates' }}>
         {(props: any) => (
           <PlaydateFeedScreen
             onSelectPost={(postId) => {
@@ -46,10 +43,7 @@ export const PlaydateStack = () => {
         )}
       </Stack.Screen>
 
-      <Stack.Screen
-        name="Detail"
-        options={{ title: 'Playdate Details' }}
-      >
+      <Stack.Screen name="Detail" options={{ title: 'Playdate Details' }}>
         {(props: any) => (
           <PlaydateDetailScreen
             post={props.route.params.post}
@@ -63,10 +57,7 @@ export const PlaydateStack = () => {
         )}
       </Stack.Screen>
 
-      <Stack.Screen
-        name="Create"
-        options={{ title: 'Create Playdate' }}
-      >
+      <Stack.Screen name="Create" options={{ title: 'Create Playdate' }}>
         {(props: any) => (
           <PostPlaydateScreen
             onSave={() => {
@@ -76,15 +67,8 @@ export const PlaydateStack = () => {
         )}
       </Stack.Screen>
 
-      <Stack.Screen
-        name="Chat"
-        options={{ title: 'Chat' }}
-      >
-        {(props: any) => (
-          <PlaydateChatScreen
-            chatId={props.route.params.chatId}
-          />
-        )}
+      <Stack.Screen name="Chat" options={{ title: 'Chat' }}>
+        {(props: any) => <PlaydateChatScreen chatId={props.route.params.chatId} />}
       </Stack.Screen>
     </Stack.Navigator>
   );

@@ -57,7 +57,10 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
       Alert.alert('Success', 'Playdate posted!');
       onSave();
     } catch (err) {
-      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to post playdate');
+      Alert.alert(
+        'Error',
+        err instanceof Error ? err.message : 'Failed to post playdate',
+      );
     } finally {
       setLoading(false);
     }
@@ -121,7 +124,11 @@ export const PostPlaydateScreen: React.FC<PostPlaydateScreenProps> = ({ onSave }
         />
       </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit} disabled={loading}>
+      <TouchableOpacity
+        style={styles.submitButton}
+        onPress={handleSubmit}
+        disabled={loading}
+      >
         <Text style={styles.submitButtonText}>Post Playdate</Text>
       </TouchableOpacity>
     </ScrollView>

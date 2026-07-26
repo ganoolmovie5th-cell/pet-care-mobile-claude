@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, SectionList } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  SectionList,
+} from 'react-native';
 import { useVet } from '../../hooks/useVet';
 import { useRecommendations } from '../../hooks/useRecommendations';
 import { useLocation } from '../../hooks/useLocation';
@@ -20,7 +27,7 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
     location?.lat || null,
     location?.lng || null,
     null,
-    5
+    5,
   );
   const [city, setCity] = useState('');
 
@@ -68,20 +75,24 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
             renderItem: ({ item }) => {
               const rec = item as RecommendedVet;
               return (
-              <TouchableOpacity
-                style={[styles.vetCard, styles.recommendedCard]}
-                onPress={() => onVetSelect(rec.id)}
-              >
-                <View style={styles.recommendedHeader}>
-                  <Text style={styles.vetName}>{rec.clinic_name}</Text>
-                  <Text style={styles.rankReasonBadge}>{rec.rank_reason}</Text>
-                </View>
-                <Text style={styles.vetInfo}>{rec.location.city} • {rec.distance_km}km</Text>
-                <View style={styles.ratingRow}>
-                  <Text style={styles.rating}>⭐ {rec.rating.toFixed(1)}</Text>
-                  <Text style={styles.fee}>Rp {rec.consultation_fee.toLocaleString()}</Text>
-                </View>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.vetCard, styles.recommendedCard]}
+                  onPress={() => onVetSelect(rec.id)}
+                >
+                  <View style={styles.recommendedHeader}>
+                    <Text style={styles.vetName}>{rec.clinic_name}</Text>
+                    <Text style={styles.rankReasonBadge}>{rec.rank_reason}</Text>
+                  </View>
+                  <Text style={styles.vetInfo}>
+                    {rec.location.city} • {rec.distance_km}km
+                  </Text>
+                  <View style={styles.ratingRow}>
+                    <Text style={styles.rating}>⭐ {rec.rating.toFixed(1)}</Text>
+                    <Text style={styles.fee}>
+                      Rp {rec.consultation_fee.toLocaleString()}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               );
             },
           },
@@ -97,7 +108,9 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
                 <Text style={styles.vetInfo}>{item.location.city}</Text>
                 <View style={styles.ratingRow}>
                   <Text style={styles.rating}>⭐ {item.rating.toFixed(1)}</Text>
-                  <Text style={styles.fee}>Rp {item.consultation_fee.toLocaleString()}</Text>
+                  <Text style={styles.fee}>
+                    Rp {item.consultation_fee.toLocaleString()}
+                  </Text>
                 </View>
               </TouchableOpacity>
             ),

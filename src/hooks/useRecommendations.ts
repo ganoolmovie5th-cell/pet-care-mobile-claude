@@ -13,7 +13,7 @@ export const useRecommendations = (
   lat: number | null,
   lng: number | null,
   petId: string | null,
-  limit: number = 10
+  limit: number = 10,
 ): UseRecommendationsReturn => {
   const [recommendations, setRecommendations] = useState<RecommendedVet[]>([]);
   const [loading, setLoading] = useState(false);

@@ -15,7 +15,9 @@ export interface Booking {
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
-export const createBooking = async (booking: Omit<Booking, 'id' | 'created_at'>): Promise<string> => {
+export const createBooking = async (
+  booking: Omit<Booking, 'id' | 'created_at'>,
+): Promise<string> => {
   const response = await axios.post(`${apiBaseUrl}/bookings`, booking);
   return response.data.id;
 };

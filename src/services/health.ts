@@ -31,7 +31,9 @@ export const getPetsByOwner = async (ownerId: string): Promise<Pet[]> => {
   return response.data;
 };
 
-export const addHealthRecord = async (record: Omit<HealthRecord, 'id' | 'created_at'>): Promise<string> => {
+export const addHealthRecord = async (
+  record: Omit<HealthRecord, 'id' | 'created_at'>,
+): Promise<string> => {
   const response = await axios.post(`${apiBaseUrl}/health/records`, record);
   return response.data.id;
 };
@@ -56,18 +58,27 @@ export const getPetProfile = async (petId: string): Promise<Pet> => {
   return pet;
 };
 
-export const updatePetProfile = async (petId: string, updates: Partial<Pet>): Promise<void> => {
+export const updatePetProfile = async (
+  petId: string,
+  updates: Partial<Pet>,
+): Promise<void> => {
   await axios.patch(`${apiBaseUrl}/health/pets/${petId}`, updates);
   await AsyncStorage.removeItem(`pet_${petId}`).catch(() => {});
 };
 
 // Vaccination Schedule API + cache
-export const getVaccinationSchedule = async (petId: string): Promise<VaccinationSchedule> => {
+export const getVaccinationSchedule = async (
+  petId: string,
+): Promise<VaccinationSchedule> => {
   const cached = await AsyncStorage.getItem(`schedule_${petId}`).catch(() => null);
   if (cached) return JSON.parse(cached);
-  const response = await axios.get(`${apiBaseUrl}/health/pets/${petId}/vaccination-schedule`);
+  const response = await axios.get(
+    `${apiBaseUrl}/health/pets/${petId}/vaccination-schedule`,
+  );
   const schedule = response.data as VaccinationSchedule;
-  await AsyncStorage.setItem(`schedule_${petId}`, JSON.stringify(schedule)).catch(() => {});
+  await AsyncStorage.setItem(`schedule_${petId}`, JSON.stringify(schedule)).catch(
+    () => {},
+  );
   return schedule;
 };
 
@@ -77,7 +88,9 @@ export const getReminderPreferences = async (): Promise<ReminderPreferences> => 
   return response.data as ReminderPreferences;
 };
 
-export const updateReminderPreferences = async (prefs: Partial<ReminderPreferences>): Promise<void> => {
+export const updateReminderPreferences = async (
+  prefs: Partial<ReminderPreferences>,
+): Promise<void> => {
   await axios.patch(`${apiBaseUrl}/health/reminders/preferences`, prefs);
 };
 
@@ -91,8 +104,12 @@ export const dismissReminder = async (reminderId: string): Promise<void> => {
 };
 
 // Booking Suggestions
-export const getBookingSuggestions = async (petId: string): Promise<BookingSuggestion[]> => {
-  const response = await axios.get(`${apiBaseUrl}/health/pets/${petId}/booking-suggestions`);
+export const getBookingSuggestions = async (
+  petId: string,
+): Promise<BookingSuggestion[]> => {
+  const response = await axios.get(
+    `${apiBaseUrl}/health/pets/${petId}/booking-suggestions`,
+  );
   return response.data as BookingSuggestion[];
 };
 
@@ -102,12 +119,15 @@ export const markVaccineComplete = async (
   vaccineId: string,
   date: string,
   vetName: string,
-  notes: string
+  notes: string,
 ): Promise<void> => {
-  await axios.patch(`${apiBaseUrl}/health/vaccination-schedules/${scheduleId}/vaccines/${vaccineId}`, {
-    lastDate: date,
-    vetName,
-    notes,
-  });
+  await axios.patch(
+    `${apiBaseUrl}/health/vaccination-schedules/${scheduleId}/vaccines/${vaccineId}`,
+    {
+      lastDate: date,
+      vetName,
+      notes,
+    },
+  );
   await AsyncStorage.removeItem(`schedule_${scheduleId}`).catch(() => {});
 };

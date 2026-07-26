@@ -1,6 +1,22 @@
 import { useState, useCallback, useEffect } from 'react';
-import { createPet, getPetsByOwner, addHealthRecord, getHealthRecordsByPet, getAllHealthRecords, HealthRecord, getVaccinationSchedule, getReminderPreferences, getBookingSuggestions, updateReminderPreferences as updateReminderPreferencesAPI } from '../services/health';
-import { Pet, VaccinationSchedule, ReminderPreferences, BookingSuggestion } from '../types/health';
+import {
+  createPet,
+  getPetsByOwner,
+  addHealthRecord,
+  getHealthRecordsByPet,
+  getAllHealthRecords,
+  HealthRecord,
+  getVaccinationSchedule,
+  getReminderPreferences,
+  getBookingSuggestions,
+  updateReminderPreferences as updateReminderPreferencesAPI,
+} from '../services/health';
+import {
+  Pet,
+  VaccinationSchedule,
+  ReminderPreferences,
+  BookingSuggestion,
+} from '../types/health';
 
 interface UseHealthReturn {
   pets: Pet[];
@@ -20,21 +36,27 @@ export const useHealth = (): UseHealthReturn => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createNewPet = useCallback(async (pet: Omit<Pet, 'id' | 'createdAt'>): Promise<string | null> => {
-    try {
-      setLoading(true);
-      setError(null);
-      const petId = await createPet(pet);
-      setPets(prev => [...prev, { id: petId, ...pet, createdAt: new Date().toISOString() }]);
-      return petId;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to create pet';
-      setError(msg);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createNewPet = useCallback(
+    async (pet: Omit<Pet, 'id' | 'createdAt'>): Promise<string | null> => {
+      try {
+        setLoading(true);
+        setError(null);
+        const petId = await createPet(pet);
+        setPets((prev) => [
+          ...prev,
+          { id: petId, ...pet, createdAt: new Date().toISOString() },
+        ]);
+        return petId;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to create pet';
+        setError(msg);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const fetchPets = useCallback(async (ownerId: string) => {
     try {
@@ -49,20 +71,23 @@ export const useHealth = (): UseHealthReturn => {
     }
   }, []);
 
-  const addRecord = useCallback(async (record: Omit<HealthRecord, 'id' | 'created_at'>): Promise<string | null> => {
-    try {
-      setLoading(true);
-      setError(null);
-      const recordId = await addHealthRecord(record);
-      return recordId;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to add record';
-      setError(msg);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const addRecord = useCallback(
+    async (record: Omit<HealthRecord, 'id' | 'created_at'>): Promise<string | null> => {
+      try {
+        setLoading(true);
+        setError(null);
+        const recordId = await addHealthRecord(record);
+        return recordId;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : 'Failed to add record';
+        setError(msg);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const fetchRecords = useCallback(async (petId: string) => {
     try {
@@ -115,7 +140,9 @@ export function useVaccinationSchedule(petId: string) {
       const data = await getVaccinationSchedule(petId);
       setSchedule(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch vaccination schedule');
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch vaccination schedule',
+      );
     } finally {
       setLoading(false);
     }
@@ -140,7 +167,9 @@ export function useReminderPreferences() {
       const data = await getReminderPreferences();
       setPrefs(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch reminder preferences');
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch reminder preferences',
+      );
     } finally {
       setLoading(false);
     }
@@ -149,9 +178,10 @@ export function useReminderPreferences() {
   const updatePrefs = useCallback(async (updates: Partial<ReminderPreferences>) => {
     try {
       await updateReminderPreferencesAPI(updates);
-      setPrefs(prev => prev ? { ...prev, ...updates } : null);
+      setPrefs((prev) => (prev ? { ...prev, ...updates } : null));
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : 'Failed to update reminder preferences';
+      const errMsg =
+        err instanceof Error ? err.message : 'Failed to update reminder preferences';
       setError(errMsg);
       throw err;
     }
@@ -176,7 +206,9 @@ export function useBookingSuggestions(petId: string) {
       const data = await getBookingSuggestions(petId);
       setSuggestions(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch booking suggestions');
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch booking suggestions',
+      );
     } finally {
       setLoading(false);
     }

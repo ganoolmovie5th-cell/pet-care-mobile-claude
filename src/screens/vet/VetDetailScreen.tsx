@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import { useVet } from '../../hooks/useVet';
 import { Vet } from '../../services/vet';
 import { getReviewsForTarget, markReviewHelpful, Review } from '../../services/review';
@@ -44,8 +51,10 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
   const handleMarkHelpful = async (reviewId: string) => {
     try {
       await markReviewHelpful(reviewId);
-      setReviews(prev =>
-        prev.map(r => (r.id === reviewId ? { ...r, helpful_count: r.helpful_count + 1 } : r))
+      setReviews((prev) =>
+        prev.map((r) =>
+          r.id === reviewId ? { ...r, helpful_count: r.helpful_count + 1 } : r,
+        ),
       );
     } catch (err) {
       console.error('Error marking review helpful:', err);
@@ -53,7 +62,7 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
   };
 
   const filteredReviews = ratingFilter
-    ? reviews.filter(r => r.rating === ratingFilter)
+    ? reviews.filter((r) => r.rating === ratingFilter)
     : reviews;
 
   if (loading) {
@@ -101,7 +110,9 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Hours</Text>
-        <Text style={styles.text}>{vet.hours.open} - {vet.hours.close}</Text>
+        <Text style={styles.text}>
+          {vet.hours.open} - {vet.hours.close}
+        </Text>
       </View>
 
       <View style={styles.section}>
@@ -112,7 +123,7 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Reviews ({reviews.length})</Text>
         <View style={styles.ratingFilterRow}>
-          {[1, 2, 3, 4, 5].map(star => (
+          {[1, 2, 3, 4, 5].map((star) => (
             <TouchableOpacity
               key={star}
               onPress={() => setRatingFilter(ratingFilter === star ? null : star)}
@@ -132,11 +143,13 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
           <Text style={styles.noReviews}>No reviews yet</Text>
         ) : (
           <View style={styles.reviewsList}>
-            {filteredReviews.map(review => (
+            {filteredReviews.map((review) => (
               <View key={review.id} style={styles.reviewCard}>
                 <View style={styles.reviewHeader}>
                   <Text style={styles.reviewRating}>{'★'.repeat(review.rating)}</Text>
-                  <Text style={styles.reviewVerified}>{review.verified ? '✓ Verified' : ''}</Text>
+                  <Text style={styles.reviewVerified}>
+                    {review.verified ? '✓ Verified' : ''}
+                  </Text>
                 </View>
                 {review.text && <Text style={styles.reviewText}>{review.text}</Text>}
                 <View style={styles.reviewFooter}>
@@ -156,10 +169,7 @@ export const VetDetailScreen: React.FC<VetDetailScreenProps> = ({ vetId, onBooki
         )}
       </View>
 
-      <TouchableOpacity
-        style={styles.bookButton}
-        onPress={() => onBooking(vet)}
-      >
+      <TouchableOpacity style={styles.bookButton} onPress={() => onBooking(vet)}>
         <Text style={styles.bookButtonText}>Book Appointment</Text>
       </TouchableOpacity>
     </ScrollView>

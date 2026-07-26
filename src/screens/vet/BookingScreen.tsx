@@ -9,7 +9,11 @@ interface BookingScreenProps {
   onBookingComplete: (bookingId: string) => void;
 }
 
-export const BookingScreen: React.FC<BookingScreenProps> = ({ vetId, vetName, onBookingComplete }) => {
+export const BookingScreen: React.FC<BookingScreenProps> = ({
+  vetId,
+  vetName,
+  onBookingComplete,
+}) => {
   const { user } = useContext(AuthContext);
   const { loading, error, createNewBooking } = useBooking();
   const [date, setDate] = useState('');

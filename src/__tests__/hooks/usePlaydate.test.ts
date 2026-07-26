@@ -51,7 +51,7 @@ describe('usePlaydatePosts', () => {
 
   it('records the error and keeps posts empty', async () => {
     (playdateService.getAllActivePosts as jest.Mock).mockRejectedValue(
-      new Error('Backend mati')
+      new Error('Backend mati'),
     );
 
     const { result } = renderHook(() => usePlaydatePosts());
@@ -121,7 +121,7 @@ describe('usePlaydateChat', () => {
 
     expect(playdateService.addMessageToChat).toHaveBeenCalledWith(
       'chat_1',
-      'Boleh, jam 4 ya'
+      'Boleh, jam 4 ya',
     );
     // once on mount, once after the send
     expect(playdateService.getPlaydateChat).toHaveBeenCalledTimes(2);
@@ -131,7 +131,7 @@ describe('usePlaydateChat', () => {
   it('addMessage returns false and records the error when the send fails', async () => {
     (playdateService.getPlaydateChat as jest.Mock).mockResolvedValue(mockChat);
     (playdateService.addMessageToChat as jest.Mock).mockRejectedValue(
-      new Error('Chat ditutup')
+      new Error('Chat ditutup'),
     );
 
     const { result } = renderHook(() => usePlaydateChat('chat_1'));

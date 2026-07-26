@@ -47,7 +47,7 @@ describe('useLocation', () => {
   it('records the error when the GPS read throws', async () => {
     (Location.requestForegroundPermissionsAsync as jest.Mock).mockResolvedValue(granted);
     (Location.getCurrentPositionAsync as jest.Mock).mockRejectedValue(
-      new Error('GPS mati')
+      new Error('GPS mati'),
     );
 
     const { result } = renderHook(() => useLocation());
@@ -84,7 +84,7 @@ describe('useLocation', () => {
     await waitFor(() =>
       expect(Location.getCurrentPositionAsync).toHaveBeenCalledWith({
         accuracy: Location.Accuracy.Balanced,
-      })
+      }),
     );
   });
 });

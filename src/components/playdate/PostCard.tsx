@@ -35,7 +35,11 @@ export const PostCard: React.FC<PostCardProps> = ({
         <View style={styles.meta}>
           <Text style={styles.location}>📍 {location}</Text>
           <Text style={styles.date}>📅 {formatDate(date)}</Text>
-          {description && <Text style={styles.description} numberOfLines={1}>{description}</Text>}
+          {description && (
+            <Text style={styles.description} numberOfLines={1}>
+              {description}
+            </Text>
+          )}
         </View>
       </View>
       <View style={styles.badge}>

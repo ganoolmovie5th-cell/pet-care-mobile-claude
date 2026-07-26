@@ -119,7 +119,7 @@ export default function BookingSuggestionScreen({ route, navigation }: Props) {
             navigation.goBack();
           },
         },
-      ]
+      ],
     );
   };
 
@@ -150,17 +150,11 @@ export default function BookingSuggestionScreen({ route, navigation }: Props) {
       </View>
 
       <View style={styles.actionContainer}>
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleCreateBooking}
-        >
+        <TouchableOpacity style={styles.primaryButton} onPress={handleCreateBooking}>
           <Text style={styles.primaryButtonText}>Create Booking</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={handleDismiss}
-        >
+        <TouchableOpacity style={styles.secondaryButton} onPress={handleDismiss}>
           <Text style={styles.secondaryButtonText}>Dismiss</Text>
         </TouchableOpacity>
       </View>

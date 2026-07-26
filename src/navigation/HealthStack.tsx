@@ -38,10 +38,7 @@ const PetListStack = () => {
         },
       }}
     >
-      <Stack.Screen
-        name="PetList"
-        options={{ title: 'My Pets' }}
-      >
+      <Stack.Screen name="PetList" options={{ title: 'My Pets' }}>
         {(props: any) => (
           <PetProfileScreen
             onSelectPet={(petId) => {
@@ -74,10 +71,7 @@ const PetListStack = () => {
         )}
       </Stack.Screen>
 
-      <Stack.Screen
-        name="AddRecord"
-        options={{ title: 'Add Health Record' }}
-      >
+      <Stack.Screen name="AddRecord" options={{ title: 'Add Health Record' }}>
         {(props: any) => (
           <AddRecordScreen
             petId={props.route.params.petId}
@@ -88,10 +82,7 @@ const PetListStack = () => {
         )}
       </Stack.Screen>
 
-      <Stack.Screen
-        name="EditPetProfile"
-        options={{ title: 'Edit Pet Profile' }}
-      >
+      <Stack.Screen name="EditPetProfile" options={{ title: 'Edit Pet Profile' }}>
         {(props: any) => (
           <EditPetProfileScreen
             petId={props.route.params.petId}

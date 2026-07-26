@@ -6,19 +6,23 @@ import { enqueueMutation } from './offline';
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
 // Phase 5: Retry logic with exponential backoff
-const exponentialBackoff = (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 30000);
+const exponentialBackoff = (attempt: number) =>
+  Math.min(1000 * Math.pow(2, attempt), 30000);
 
 const retryRequest = async <T>(
   fn: () => Promise<T>,
   maxRetries = 3,
-  attempt = 0
+  attempt = 0,
 ): Promise<T> => {
   try {
     return await fn();
   } catch (err: any) {
-    if (attempt < maxRetries && (err.code === 'ECONNREFUSED' || err.response?.status >= 500)) {
+    if (
+      attempt < maxRetries &&
+      (err.code === 'ECONNREFUSED' || err.response?.status >= 500)
+    ) {
       const delay = exponentialBackoff(attempt);
-      await new Promise(resolve => setTimeout(resolve, delay));
+      await new Promise((resolve) => setTimeout(resolve, delay));
       return retryRequest(fn, maxRetries, attempt + 1);
     }
     throw err;
@@ -28,10 +32,12 @@ const retryRequest = async <T>(
 // Task 22: API wrappers with AsyncStorage caching
 
 export const createPlaydatePost = async (
-  post: Omit<PlaydatePost, 'id' | 'created_at'>
+  post: Omit<PlaydatePost, 'id' | 'created_at'>,
 ): Promise<PlaydatePost> => {
   try {
-    const response = await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/posts`, post));
+    const response = await retryRequest(() =>
+      axios.post(`${apiBaseUrl}/playdate/posts`, post),
+    );
     const newPost = response.data as PlaydatePost;
     await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
     return newPost;
@@ -65,16 +71,20 @@ export const getPlaydatePost = async (postId: string): Promise<PlaydatePost> => 
 
   const response = await axios.get(`${apiBaseUrl}/playdate/posts/${postId}`);
   const post = response.data as PlaydatePost;
-  await AsyncStorage.setItem(`playdate_post_${postId}`, JSON.stringify(post)).catch(() => {});
+  await AsyncStorage.setItem(`playdate_post_${postId}`, JSON.stringify(post)).catch(
+    () => {},
+  );
   return post;
 };
 
 export const updatePlaydatePost = async (
   postId: string,
-  updates: Partial<PlaydatePost>
+  updates: Partial<PlaydatePost>,
 ): Promise<void> => {
   try {
-    await retryRequest(() => axios.patch(`${apiBaseUrl}/playdate/posts/${postId}`, updates));
+    await retryRequest(() =>
+      axios.patch(`${apiBaseUrl}/playdate/posts/${postId}`, updates),
+    );
     await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
     await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
   } catch (err) {
@@ -83,42 +93,56 @@ export const updatePlaydatePost = async (
   }
 };
 
-export const getPlaydatePostsByOwner = async (ownerId: string): Promise<PlaydatePost[]> => {
+export const getPlaydatePostsByOwner = async (
+  ownerId: string,
+): Promise<PlaydatePost[]> => {
   const response = await axios.get(`${apiBaseUrl}/playdate/posts?owner=${ownerId}`);
   return response.data as PlaydatePost[];
 };
 
 export const addInterestedOwner = async (postId: string): Promise<void> => {
   try {
-    await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interested`));
+    await retryRequest(() =>
+      axios.post(`${apiBaseUrl}/playdate/posts/${postId}/interested`),
+    );
     await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
     await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
   } catch (err) {
-    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}/interested`, 'POST', {});
+    await enqueueMutation(
+      `${apiBaseUrl}/playdate/posts/${postId}/interested`,
+      'POST',
+      {},
+    );
   }
 };
 
 export const removeInterestedOwner = async (postId: string): Promise<void> => {
   try {
-    await retryRequest(() => axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interested`));
+    await retryRequest(() =>
+      axios.delete(`${apiBaseUrl}/playdate/posts/${postId}/interested`),
+    );
     await AsyncStorage.removeItem(`playdate_post_${postId}`).catch(() => {});
     await AsyncStorage.removeItem('playdate_posts_all').catch(() => {});
   } catch (err) {
-    await enqueueMutation(`${apiBaseUrl}/playdate/posts/${postId}/interested`, 'DELETE', {});
+    await enqueueMutation(
+      `${apiBaseUrl}/playdate/posts/${postId}/interested`,
+      'DELETE',
+      {},
+    );
   }
 };
 
 export const createPlaydateChat = async (
   postId: string,
   interestedOwnerId: string,
-  initialMessage: string
+  initialMessage: string,
 ): Promise<PlaydateChat> => {
   try {
     const response = await retryRequest(() =>
       axios.post(`${apiBaseUrl}/playdate/posts/${postId}/chat/start`, {
         interestedOwnerId,
         initialMessage,
-      })
+      }),
     );
     return response.data as PlaydateChat;
   } catch (err) {
@@ -152,17 +176,23 @@ export const getPlaydateChat = async (chatId: string): Promise<PlaydateChat> => 
 
   const response = await axios.get(`${apiBaseUrl}/playdate/chat/${chatId}`);
   const chat = response.data as PlaydateChat;
-  await AsyncStorage.setItem(`playdate_chat_${chatId}`, JSON.stringify(chat)).catch(() => {});
+  await AsyncStorage.setItem(`playdate_chat_${chatId}`, JSON.stringify(chat)).catch(
+    () => {},
+  );
   return chat;
 };
 
 export const addMessageToChat = async (chatId: string, text: string): Promise<void> => {
   try {
-    await retryRequest(() => axios.post(`${apiBaseUrl}/playdate/chat/${chatId}/message`, { text }));
+    await retryRequest(() =>
+      axios.post(`${apiBaseUrl}/playdate/chat/${chatId}/message`, { text }),
+    );
     await AsyncStorage.removeItem(`playdate_chat_${chatId}`).catch(() => {});
   } catch (err) {
     // Phase 5: Queue for offline sync
-    await enqueueMutation(`${apiBaseUrl}/playdate/chat/${chatId}/message`, 'POST', { text });
+    await enqueueMutation(`${apiBaseUrl}/playdate/chat/${chatId}/message`, 'POST', {
+      text,
+    });
   }
 };
 

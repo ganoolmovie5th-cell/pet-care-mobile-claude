@@ -69,7 +69,7 @@ export const useVet = (): UseVetReturn => {
         setLoading(false);
       }
     },
-    []
+    [],
   );
 
   return {

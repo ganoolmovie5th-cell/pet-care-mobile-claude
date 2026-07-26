@@ -144,7 +144,7 @@ function handleAxiosError(error: AxiosError): AppError {
 export async function withRetry<T>(
   fn: () => Promise<T>,
   maxRetries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ): Promise<T> {
   let lastError: any;
 
@@ -159,7 +159,7 @@ export async function withRetry<T>(
         throw appError;
       }
 
-      await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt)));
+      await new Promise((resolve) => setTimeout(resolve, delay * Math.pow(2, attempt)));
     }
   }
 

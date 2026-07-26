@@ -56,7 +56,7 @@ describe('useBooking', () => {
 
   it('createNewBooking returns null and records the error on failure', async () => {
     (bookingService.createBooking as jest.Mock).mockRejectedValue(
-      new Error('Slot already taken')
+      new Error('Slot already taken'),
     );
 
     const { result } = renderHook(() => useBooking());
@@ -87,7 +87,7 @@ describe('useBooking', () => {
 
   it('fetchBookings keeps the list empty on failure', async () => {
     (bookingService.getBookingsByOwner as jest.Mock).mockRejectedValue(
-      new Error('Unauthorized')
+      new Error('Unauthorized'),
     );
 
     const { result } = renderHook(() => useBooking());

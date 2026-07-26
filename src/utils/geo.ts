@@ -4,7 +4,7 @@ export const haversineDistance = (
   lat1: number,
   lng1: number,
   lat2: number,
-  lng2: number
+  lng2: number,
 ): number => {
   const toRad = (deg: number) => (deg * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
@@ -23,14 +23,14 @@ export const filterPostsByRadius = (
   posts: Array<any>,
   userLat: number,
   userLng: number,
-  radiusKm: number = 20
+  radiusKm: number = 20,
 ) => {
   return posts
-    .map(post => ({
+    .map((post) => ({
       ...post,
       distance: haversineDistance(userLat, userLng, post.location.lat, post.location.lng),
     }))
-    .filter(post => post.distance <= radiusKm)
+    .filter((post) => post.distance <= radiusKm)
     .sort((a, b) => a.distance - b.distance);
 };
 
@@ -47,7 +47,7 @@ export const getCurrentLocation = async (): Promise<{
             lng: position.coords.longitude,
           });
         },
-        () => resolve(null)
+        () => resolve(null),
       );
     } else {
       resolve(null);

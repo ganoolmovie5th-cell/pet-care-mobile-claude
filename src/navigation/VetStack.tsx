@@ -34,7 +34,7 @@ export const VetStack = () => {
       <Stack.Screen name="VetBrowse" options={{ title: 'Vets' }}>
         {(props: any) => (
           <VetBrowseScreen
-            onVetSelect={vetId => props.navigation.navigate('VetDetail', { vetId })}
+            onVetSelect={(vetId) => props.navigation.navigate('VetDetail', { vetId })}
           />
         )}
       </Stack.Screen>
@@ -43,7 +43,7 @@ export const VetStack = () => {
         {(props: any) => (
           <VetDetailScreen
             vetId={props.route.params.vetId}
-            onBooking={vet =>
+            onBooking={(vet) =>
               props.navigation.navigate('Booking', {
                 vetId: vet.id,
                 vetName: vet.clinic_name,
@@ -59,7 +59,7 @@ export const VetStack = () => {
           <BookingScreen
             vetId={props.route.params.vetId}
             vetName={props.route.params.vetName}
-            onBookingComplete={bookingId =>
+            onBookingComplete={(bookingId) =>
               props.navigation.navigate('BookingConfirm', {
                 bookingId,
                 vetId: props.route.params.vetId,

@@ -13,7 +13,7 @@ export const usePlaydateMatches = (
   lng: number | null,
   petId: string | null,
   radiusKm: number = 5,
-  sort: 'score' | 'recent' = 'score'
+  sort: 'score' | 'recent' = 'score',
 ): UsePlaydateMatchesReturn => {
   const [matches, setMatches] = useState<PlaydateMatch[]>([]);
   const [loading, setLoading] = useState(false);

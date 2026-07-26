@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
-import { processSyncQueue, getQueueSize, enqueueMutation as queueMutation } from '../services/offline';
+import {
+  processSyncQueue,
+  getQueueSize,
+  enqueueMutation as queueMutation,
+} from '../services/offline';
 
 export function useOffline() {
   // ponytail: no connectivity state here. Nothing detects network loss (no
@@ -23,7 +27,7 @@ export function useOffline() {
   const enqueueMutation = async (
     endpoint: string,
     method: 'POST' | 'PUT' | 'PATCH' | 'DELETE',
-    payload: any
+    payload: any,
   ) => {
     return await queueMutation(endpoint, method, payload);
   };

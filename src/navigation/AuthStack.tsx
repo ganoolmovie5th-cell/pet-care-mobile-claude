@@ -15,17 +15,11 @@ export const AuthStack = () => {
       }}
     >
       {!phoneSent ? (
-        <Stack.Screen
-          name="Phone"
-          options={{ animation: 'none' }}
-        >
+        <Stack.Screen name="Phone" options={{ animation: 'none' }}>
           {() => <PhoneScreen onPhoneSent={() => setPhoneSent(true)} />}
         </Stack.Screen>
       ) : (
-        <Stack.Screen
-          name="OTP"
-          options={{ animation: 'none' }}
-        >
+        <Stack.Screen name="OTP" options={{ animation: 'none' }}>
           {() => <OTPScreen onOTPVerified={() => setPhoneSent(false)} />}
         </Stack.Screen>
       )}

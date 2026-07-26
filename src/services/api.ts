@@ -10,7 +10,7 @@ export const api = axios.create({
 
 // Add auth token to requests
 api.interceptors.request.use(
-  async config => {
+  async (config) => {
     try {
       const token = await AsyncStorage.getItem('auth_token');
       if (token) {
@@ -21,16 +21,16 @@ api.interceptors.request.use(
     }
     return config;
   },
-  error => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // Handle responses
 api.interceptors.response.use(
-  response => response,
-  async error => {
+  (response) => response,
+  async (error) => {
     if (error.response?.status === 401) {
       await AsyncStorage.removeItem('auth_token');
     }
     return Promise.reject(error);
-  }
+  },
 );

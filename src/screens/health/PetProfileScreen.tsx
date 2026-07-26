@@ -60,7 +60,9 @@ export const PetProfileScreen: React.FC<PetProfileScreenProps> = ({
       {pets.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No pets yet</Text>
-          <Text style={styles.emptySubtext}>Add your first pet to start tracking health</Text>
+          <Text style={styles.emptySubtext}>
+            Add your first pet to start tracking health
+          </Text>
           <TouchableOpacity style={styles.emptyButton} onPress={onAddPet}>
             <Text style={styles.emptyButtonText}>Add Pet</Text>
           </TouchableOpacity>

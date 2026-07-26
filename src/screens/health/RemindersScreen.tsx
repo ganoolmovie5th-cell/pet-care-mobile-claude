@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { useHealth } from '../../hooks/useHealth';
 import { RecordCard } from '../../components/health/RecordCard';
 import { RemindersWidget } from '../../components/health/RemindersWidget';
@@ -74,7 +68,7 @@ export const RemindersScreen: React.FC = () => {
 
       <RemindersWidget
         totalRecords={records.filter((r) => r.next_due_date).length}
-        overduCount={overdueRecords.length}
+        overdueCount={overdueRecords.length}
         upcomingCount={upcomingRecords.length}
       />
 

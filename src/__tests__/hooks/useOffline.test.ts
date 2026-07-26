@@ -90,7 +90,7 @@ describe('useOffline', () => {
 
   it('syncQueue rethrows but still clears the syncing flag', async () => {
     (offlineService.processSyncQueue as jest.Mock).mockRejectedValue(
-      new Error('Backend mati')
+      new Error('Backend mati'),
     );
 
     const { result } = renderHook(() => useOffline());

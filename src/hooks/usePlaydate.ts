@@ -93,7 +93,7 @@ export const usePlaydateChat = (chatId: string) => {
         return false;
       }
     },
-    [chatId, refetch]
+    [chatId, refetch],
   );
 
   useEffect(() => {

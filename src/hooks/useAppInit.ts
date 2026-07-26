@@ -46,10 +46,16 @@ export const useAppInit = () => {
     setSyncing(true);
     try {
       const { synced, failed } = await processSyncQueue();
-      addBreadcrumb(`Sync complete: ${synced} synced, ${failed} failed`, failed > 0 ? 'warning' : 'info');
+      addBreadcrumb(
+        `Sync complete: ${synced} synced, ${failed} failed`,
+        failed > 0 ? 'warning' : 'info',
+      );
       await checkQueue();
     } catch (err) {
-      addBreadcrumb(`Sync failed: ${err instanceof Error ? err.message : 'unknown error'}`, 'error');
+      addBreadcrumb(
+        `Sync failed: ${err instanceof Error ? err.message : 'unknown error'}`,
+        'error',
+      );
     } finally {
       setSyncing(false);
     }

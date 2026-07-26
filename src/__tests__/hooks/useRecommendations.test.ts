@@ -30,7 +30,7 @@ describe('useRecommendations', () => {
     });
 
     const { result } = renderHook(() =>
-      useRecommendations('user_1', LAT, LNG, 'pet_1', 5)
+      useRecommendations('user_1', LAT, LNG, 'pet_1', 5),
     );
 
     await waitFor(() => expect(result.current.recommendations).toHaveLength(1));
@@ -40,7 +40,7 @@ describe('useRecommendations', () => {
       LAT,
       LNG,
       'pet_1',
-      5
+      5,
     );
     expect(result.current.recommendations[0].rank_reason).toBe('Dekat & rating tinggi');
     expect(result.current.loading).toBe(false);
@@ -53,7 +53,7 @@ describe('useRecommendations', () => {
     ['petId null', 'user_1', LAT, LNG, null],
   ])('skips the request when %s', async (_label, ownerId, lat, lng, petId) => {
     const { result } = renderHook(() =>
-      useRecommendations(ownerId as any, lat as any, lng as any, petId as any)
+      useRecommendations(ownerId as any, lat as any, lng as any, petId as any),
     );
 
     await act(async () => {
@@ -80,9 +80,7 @@ describe('useRecommendations', () => {
       .mockResolvedValueOnce({ recommended_vets: mockRecommended })
       .mockRejectedValueOnce(new Error('Rekomendasi tidak tersedia'));
 
-    const { result } = renderHook(() =>
-      useRecommendations('user_1', LAT, LNG, 'pet_1')
-    );
+    const { result } = renderHook(() => useRecommendations('user_1', LAT, LNG, 'pet_1'));
     await waitFor(() => expect(result.current.recommendations).toHaveLength(1));
 
     await act(async () => {
@@ -106,8 +104,8 @@ describe('useRecommendations', () => {
         LAT,
         LNG,
         'pet_1',
-        10
-      )
+        10,
+      ),
     );
   });
 });

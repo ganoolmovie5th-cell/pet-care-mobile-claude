@@ -18,7 +18,9 @@ export const PhoneScreen: React.FC<PhoneScreenProps> = ({ onPhoneSent }) => {
 
     try {
       setLoading(true);
-      const formattedPhone = phone.startsWith('62') ? `+${phone}` : `+62${phone.replace(/^0/, '')}`;
+      const formattedPhone = phone.startsWith('62')
+        ? `+${phone}`
+        : `+62${phone.replace(/^0/, '')}`;
       await sendPhoneOTP(formattedPhone);
       onPhoneSent();
     } catch (error) {
@@ -39,14 +41,12 @@ export const PhoneScreen: React.FC<PhoneScreenProps> = ({ onPhoneSent }) => {
         onChangeText={setPhone}
         editable={!loading}
       />
-      <TouchableOpacity 
-        style={[styles.button, loading && styles.buttonDisabled]} 
+      <TouchableOpacity
+        style={[styles.button, loading && styles.buttonDisabled]}
         onPress={handleSendOTP}
         disabled={loading}
       >
-        <Text style={styles.buttonText}>
-          {loading ? 'Sending...' : 'Send OTP'}
-        </Text>
+        <Text style={styles.buttonText}>{loading ? 'Sending...' : 'Send OTP'}</Text>
       </TouchableOpacity>
     </View>
   );
