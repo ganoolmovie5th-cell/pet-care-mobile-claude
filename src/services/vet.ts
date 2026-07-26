@@ -21,7 +21,7 @@ export interface Vet {
   created_at: string;
 }
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
 export const getAllVets = async (): Promise<Vet[]> => {
   const response = await axios.get(`${apiBaseUrl}/vets`);

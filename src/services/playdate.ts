@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlaydatePost, PlaydateChat, Message } from '../types/playdate';
 import { enqueueMutation, processSyncQueue } from './offline';
 
-const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 
 // Phase 5: Retry logic with exponential backoff
 const exponentialBackoff = (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 30000);

@@ -41,7 +41,7 @@ export const logout = async (): Promise<void> => {
 };
 
 export const exchangeIdTokenForJWT = async (idToken: string): Promise<string> => {
-  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
+  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
   const response = await axios.post(`${apiBaseUrl}/auth/verify-token`, {
     idToken,
   });

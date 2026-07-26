@@ -52,7 +52,7 @@ eas submit --platform android --latest
 
 ## Environment Variables
 Production build uses `.env.production`:
-- REACT_APP_API_BASE_URL=https://us-central1-pet-care-prod.cloudfunctions.net
+- EXPO_PUBLIC_API_BASE_URL=https://us-central1-pet-care-prod.cloudfunctions.net
 - Firebase config (public keys)
 
 ## Credentials Management

@@ -13,6 +13,12 @@ dist/
 .env
 .env.local
 .env.*.local
+.env.production
+
+# Credentials referenced by eas.json and the native Firebase SDKs
+keys/
+google-services.json
+GoogleService-Info.plist
 
 # IDE
 .vscode/

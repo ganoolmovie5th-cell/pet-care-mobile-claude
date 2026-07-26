@@ -112,7 +112,7 @@ git push origin main
 # 3a. Verify mobile config
 cat .env.production
 # Should have:
-# REACT_APP_API_BASE_URL=https://us-central1-pet-care-prod.cloudfunctions.net
+# EXPO_PUBLIC_API_BASE_URL=https://us-central1-pet-care-prod.cloudfunctions.net
 # Firebase keys (same as admin)
 
 cat eas.json

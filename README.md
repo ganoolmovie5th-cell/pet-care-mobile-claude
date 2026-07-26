@@ -131,7 +131,7 @@ npm install
 
 # Configure environment
 cp .env.example .env
-# Fill in: REACT_APP_FIREBASE_API_KEY, REACT_APP_FIREBASE_PROJECT_ID, REACT_APP_API_BASE_URL
+# Fill in: EXPO_PUBLIC_FIREBASE_API_KEY, EXPO_PUBLIC_FIREBASE_PROJECT_ID, EXPO_PUBLIC_API_BASE_URL
 
 # Start dev server
 npm run web              # Opens Expo Go web preview
