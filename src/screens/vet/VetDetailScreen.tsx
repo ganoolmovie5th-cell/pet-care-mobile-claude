@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { useVet } from '../../hooks/useVet';
 import { Vet } from '../../services/vet';
 import { getReviewsForTarget, markReviewHelpful, Review } from '../../services/review';

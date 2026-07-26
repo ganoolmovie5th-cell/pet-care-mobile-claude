@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, Text, TouchableOpacity, ActivityIndicator, StyleSheet, SectionList } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, StyleSheet, SectionList } from 'react-native';
 import { useVet } from '../../hooks/useVet';
 import { useRecommendations } from '../../hooks/useRecommendations';
 import { useLocation } from '../../hooks/useLocation';
@@ -15,7 +15,7 @@ export const VetBrowseScreen: React.FC<VetBrowseScreenProps> = ({ onVetSelect })
   const { vets, loading, error, fetchAllVets, searchVetsByFilters } = useVet();
   const { user } = useAuth();
   const { location } = useLocation();
-  const { recommendations, loading: recLoading } = useRecommendations(
+  const { recommendations } = useRecommendations(
     user?.uid || null,
     location?.lat || null,
     location?.lng || null,

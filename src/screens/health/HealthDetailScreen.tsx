@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useHealth } from '../../hooks/useHealth';

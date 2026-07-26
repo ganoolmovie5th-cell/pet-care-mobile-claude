@@ -8,7 +8,7 @@ interface RemindersWidgetProps {
 }
 
 export const RemindersWidget: React.FC<RemindersWidgetProps> = ({
-  totalRecords,
+  totalRecords: _totalRecords,
   overduCount,
   upcomingCount,
 }) => {

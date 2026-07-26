@@ -6,7 +6,6 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useVaccinationSchedule } from '../../hooks/useHealth';
@@ -43,7 +42,7 @@ interface SectionData {
   isEmpty: boolean;
 }
 
-export default function VaccinationDashboardScreen({ route, navigation }: Props) {
+export default function VaccinationDashboardScreen({ route }: Props) {
   const { petId } = route.params;
   const { schedule, loading, error, refetch } = useVaccinationSchedule(petId);
 

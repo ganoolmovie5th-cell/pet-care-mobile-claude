@@ -20,7 +20,7 @@ interface PlaydateChatScreenProps {
 export const PlaydateChatScreen: React.FC<PlaydateChatScreenProps> = ({ chatId }) => {
   const { user } = useContext(AuthContext);
   const [messageText, setMessageText] = useState('');
-  const { chat, loading, error, addMessage, refetch } = usePlaydateChat(chatId);
+  const { chat, loading, error, addMessage } = usePlaydateChat(chatId);
 
   const handleSend = async () => {
     if (!messageText.trim()) return;

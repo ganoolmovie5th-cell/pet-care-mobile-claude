@@ -23,7 +23,7 @@ const VACCINES = [
   { id: 'lyme', name: 'Lyme' },
 ];
 
-export default function ReminderPreferencesScreen({ navigation }: Props) {
+export default function ReminderPreferencesScreen(_props: Props) {
   const { prefs, loading, error: prefError, updatePrefs } = useReminderPreferences();
   const [smsEnabled, setSmsEnabled] = useState(false);
   const [pushEnabled, setPushEnabled] = useState(false);

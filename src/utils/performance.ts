@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 
 export function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
@@ -47,8 +47,7 @@ export function optimizeImage(url: string, width: number = 300, quality: number 
 }
 
 export function useMemorizedList<T>(
-  items: T[],
-  compareFn: (prev: T[], next: T[]) => boolean = (a, b) => a.length === b.length
+  items: T[]
 ) {
   return useMemo(() => items, [items, items.length]);
 }

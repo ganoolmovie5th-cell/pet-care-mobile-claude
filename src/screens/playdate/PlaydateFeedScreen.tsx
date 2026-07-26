@@ -9,7 +9,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { usePlaydatePosts } from '../../hooks/usePlaydate';
-import { useAuth } from '../../hooks/useAuth';
 import { useLocation } from '../../hooks/useLocation';
 import { usePlaydateMatches } from '../../hooks/usePlaydateMatches';
 import { PostCard } from '../../components/playdate/PostCard';
@@ -23,7 +22,6 @@ export const PlaydateFeedScreen: React.FC<PlaydateFeedScreenProps> = ({
   onSelectPost,
   onCreatePost,
 }) => {
-  const { user } = useAuth();
   const { location } = useLocation();
   const [showMatches, setShowMatches] = useState(true);
 

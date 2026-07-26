@@ -7,7 +7,6 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useHealth } from '../../hooks/useHealth';
-import { HealthRecord } from '../../services/health';
 import { RecordCard } from '../../components/health/RecordCard';
 import { RemindersWidget } from '../../components/health/RemindersWidget';
 

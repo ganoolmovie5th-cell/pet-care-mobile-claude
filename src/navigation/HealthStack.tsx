@@ -105,9 +105,7 @@ const PetListStack = () => {
       <Stack.Screen
         name="VaccinationDashboard"
         component={VaccinationDashboardScreen}
-        options={({ route }: any) => ({
-          title: 'Vaccination Status',
-        })}
+        options={{ title: 'Vaccination Status' }}
       />
 
       <Stack.Screen

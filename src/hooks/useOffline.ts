@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { processSyncQueue, getQueueSize, enqueueMutation as queueMutation } from '../services/offline';
 
 export function useOffline() {
-  const [isOnline, setIsOnline] = useState(true);
+  // ponytail: no connectivity state here. Nothing detects network loss (no
+  // netinfo/expo-network dep), so an `isOnline` flag would always read true.
+  // Add it back together with a real listener when a consumer needs it.
   const [queueSize, setQueueSize] = useState(0);
   const [syncing, setSyncing] = useState(false);
 
@@ -39,7 +41,6 @@ export function useOffline() {
   };
 
   return {
-    isOnline,
     queueSize,
     syncing,
     enqueueMutation,

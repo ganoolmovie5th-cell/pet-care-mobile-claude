@@ -27,7 +27,7 @@ export const BookingConfirmScreen: React.FC<BookingConfirmScreenProps> = ({
   bookingId,
   amount,
   petName,
-  vetName,
+  vetName: _vetName,
   vetClinicName,
   vetId,
   userId,

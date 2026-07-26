@@ -23,7 +23,7 @@ interface VaccineCardProps {
 
 export const VaccineCard: React.FC<VaccineCardProps> = ({
   vaccine,
-  petId,
+  petId: _petId,
   scheduleId,
   onMarkComplete,
 }) => {

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PlaydatePost, PlaydateChat, Message } from '../types/playdate';
-import { enqueueMutation, processSyncQueue } from './offline';
+import { PlaydatePost, PlaydateChat } from '../types/playdate';
+import { enqueueMutation } from './offline';
 
 const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
 

@@ -1,5 +1,4 @@
 import {
-  signInWithPhoneNumber,
   ConfirmationResult,
   User,
   signOut,

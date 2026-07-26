@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
 import { useBooking } from '../../hooks/useBooking';
 

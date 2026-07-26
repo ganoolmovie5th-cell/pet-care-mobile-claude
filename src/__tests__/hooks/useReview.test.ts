@@ -1,4 +1,4 @@
-import { renderHook, act, waitFor } from '@testing-library/react-native';
+import { renderHook, act } from '@testing-library/react-native';
 import { useReview } from '../../hooks/useReview';
 import * as reviewService from '../../services/review';
 

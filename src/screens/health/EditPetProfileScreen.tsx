@@ -22,7 +22,7 @@ export const EditPetProfileScreen: React.FC<EditPetProfileScreenProps> = ({
   petId,
   onSave,
 }) => {
-  const [pet, setPet] = useState<Pet | null>(null);
+  const [, setPet] = useState<Pet | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
