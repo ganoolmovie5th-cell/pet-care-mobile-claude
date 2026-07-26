@@ -1,12 +1,13 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { AuthContext } from '../../context/AuthContext';
 import { useBooking } from '../../hooks/useBooking';
+import { useHealth } from '../../hooks/useHealth';
 
 interface BookingScreenProps {
   vetId: string;
   vetName: string;
-  onBookingComplete: (bookingId: string) => void;
+  onBookingComplete: (bookingId: string, petName: string) => void;
 }
 
 export const BookingScreen: React.FC<BookingScreenProps> = ({
@@ -16,10 +17,15 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
 }) => {
   const { user } = useContext(AuthContext);
   const { loading, error, createNewBooking } = useBooking();
+  const { pets, fetchPets } = useHealth();
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [petId, setPetId] = useState('');
   const [notes, setNotes] = useState('');
+
+  useEffect(() => {
+    if (user) fetchPets(user.uid);
+  }, [user, fetchPets]);
 
   const handleBook = async () => {
     if (!date || !time || !petId) {
@@ -45,7 +51,8 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
 
     if (bookingId) {
       Alert.alert('Success', 'Appointment booked!');
-      onBookingComplete(bookingId);
+      const petName = pets.find((p) => p.id === petId)?.name || 'Pet';
+      onBookingComplete(bookingId, petName);
     } else {
       Alert.alert('Error', error || 'Failed to book appointment');
     }
@@ -78,14 +85,24 @@ export const BookingScreen: React.FC<BookingScreenProps> = ({
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.label}>Pet ID</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Your pet ID"
-          value={petId}
-          onChangeText={setPetId}
-          editable={!loading}
-        />
+        <Text style={styles.label}>Pet</Text>
+        {pets.length === 0 ? (
+          <Text style={styles.empty}>No pets yet. Add one in the Health tab first.</Text>
+        ) : (
+          // ponytail: plain tappable rows, not a picker lib. An owner has a
+          // handful of pets, so a scrolling list buys nothing here.
+          pets.map((pet) => (
+            <TouchableOpacity
+              key={pet.id}
+              style={[styles.petRow, petId === pet.id && styles.petRowSelected]}
+              onPress={() => setPetId(pet.id)}
+              disabled={loading}
+            >
+              <Text style={styles.petName}>{pet.name}</Text>
+              <Text style={styles.petBreed}>{pet.breed}</Text>
+            </TouchableOpacity>
+          ))
+        )}
       </View>
 
       <View style={styles.section}>
@@ -143,6 +160,29 @@ const styles = StyleSheet.create({
   textarea: {
     height: 100,
     textAlignVertical: 'top',
+  },
+  empty: {
+    fontSize: 14,
+    color: '#666',
+  },
+  petRow: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  petRowSelected: {
+    borderColor: '#0f5c4a',
+    backgroundColor: '#e8f3f0',
+  },
+  petName: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  petBreed: {
+    fontSize: 12,
+    color: '#666',
   },
   error: {
     color: 'red',

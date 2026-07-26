@@ -15,6 +15,7 @@ export type VetStackParamList = {
     vetId: string;
     vetName: string;
     amount: number;
+    petName: string;
   };
 };
 
@@ -59,12 +60,13 @@ export const VetStack = () => {
           <BookingScreen
             vetId={props.route.params.vetId}
             vetName={props.route.params.vetName}
-            onBookingComplete={(bookingId) =>
+            onBookingComplete={(bookingId, petName) =>
               props.navigation.navigate('BookingConfirm', {
                 bookingId,
                 vetId: props.route.params.vetId,
                 vetName: props.route.params.vetName,
                 amount: props.route.params.fee,
+                petName,
               })
             }
           />
@@ -76,9 +78,7 @@ export const VetStack = () => {
           <BookingConfirmScreen
             bookingId={props.route.params.bookingId}
             amount={props.route.params.amount}
-            // ponytail: BookingScreen collects a petId typed by hand, never a
-            // name. Thread the real one through once pets are picked from a list.
-            petName="Pet"
+            petName={props.route.params.petName}
             vetName={props.route.params.vetName}
             vetClinicName={props.route.params.vetName}
             vetId={props.route.params.vetId}
