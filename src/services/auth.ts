@@ -1,6 +1,5 @@
 import { ConfirmationResult, User, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth } from './firebase';
-import axios from 'axios';
 
 let confirmationResult: ConfirmationResult | null = null;
 
@@ -32,14 +31,6 @@ export const getIdToken = async (): Promise<string> => {
 export const logout = async (): Promise<void> => {
   await signOut(auth);
   confirmationResult = null;
-};
-
-export const exchangeIdTokenForJWT = async (idToken: string): Promise<string> => {
-  const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-  const response = await axios.post(`${apiBaseUrl}/auth/verify-token`, {
-    idToken,
-  });
-  return response.data.token;
 };
 
 export const onAuthStateChange = (callback: (user: User | null) => void) => {

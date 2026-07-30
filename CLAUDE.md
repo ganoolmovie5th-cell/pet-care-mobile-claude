@@ -126,7 +126,8 @@ npm run build           # Verify build succeeds
 ## Firebase & Offline-First
 
 ### Authentication
-Phone OTP → Firebase ID token → Backend JWT (see backend CLAUDE.md for flow)
+Phone OTP → Firebase ID token → sent as `Authorization: Bearer <idToken>` on every
+API request (see backend CLAUDE.md for the server side)
 
 ### Persistence
 AsyncStorage (React Native) for:
@@ -168,7 +169,7 @@ reminders/{reminderId}
 ## Security
 
 - No password storage (phone OTP only)
-- JWT in localStorage + AsyncStorage
+- Firebase SDK owns the session; ID tokens are never persisted by app code
 - Firestore rules (owner isolation)
 - No secrets in code or .env (use .env.example)
 
