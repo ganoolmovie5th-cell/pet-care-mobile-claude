@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+import { api } from './api';
 
 export interface InsuranceClick {
   id: string;
@@ -9,16 +7,9 @@ export interface InsuranceClick {
   timestamp: string;
 }
 
-export const trackInsuranceClick = async (
-  userId: string,
-  providerName: string,
-): Promise<void> => {
+export const trackInsuranceClick = async (providerName: string): Promise<void> => {
   try {
-    await axios.post(`${apiBaseUrl}/analytics/insurance-click`, {
-      userId,
-      providerName,
-      timestamp: new Date().toISOString(),
-    });
+    await api.post('/analytics/insurance-click', { providerName });
   } catch (err) {
     console.error('Failed to track insurance click:', err);
   }

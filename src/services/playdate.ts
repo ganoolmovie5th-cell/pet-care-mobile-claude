@@ -1,4 +1,6 @@
-import axios from 'axios';
+// Aliased so every call below goes through the instance that attaches the auth
+// header; absolute URLs still win over the instance baseURL.
+import { api as axios } from './api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { PlaydatePost, PlaydateChat } from '../types/playdate';
 import { enqueueMutation } from './offline';

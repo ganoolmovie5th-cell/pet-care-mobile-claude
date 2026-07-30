@@ -1,6 +1,4 @@
-import axios from 'axios';
-
-const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://localhost:5000';
+import { api } from './api';
 
 export interface Invoice {
   id: string;
@@ -19,7 +17,7 @@ export const createInvoice = async (
   amount: number,
   description: string,
 ): Promise<Invoice> => {
-  const response = await axios.post(`${apiBaseUrl}/payments/create-invoice`, {
+  const response = await api.post('/payments/create-invoice', {
     bookingId,
     amount,
     description,
@@ -28,13 +26,13 @@ export const createInvoice = async (
 };
 
 export const getInvoiceStatus = async (invoiceId: string): Promise<Invoice> => {
-  const response = await axios.get(`${apiBaseUrl}/payments/invoice/${invoiceId}`);
+  const response = await api.get(`/payments/invoice/${invoiceId}`);
   return response.data;
 };
 
 export const checkPaymentStatus = async (
   bookingId: string,
 ): Promise<{ status: string; paidAt?: string }> => {
-  const response = await axios.get(`${apiBaseUrl}/payments/booking/${bookingId}/status`);
+  const response = await api.get(`/payments/booking/${bookingId}/status`);
   return response.data;
 };
