@@ -43,3 +43,7 @@ coverage/
 Thumbs.db
 docs/superpowers/progress.md
 .superpowers/
+
+# AI IDE config
+.kiro/
+.claude/
