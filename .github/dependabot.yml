@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # No patched release exists (transitive, build-time only).
+      # braces: GHSA-vfj7-8cjw-p6xm (first_patched_version null)
+      - dependency-name: "braces"
+      # node-forge: GHSA-86w9-cpqp-85rv (incomplete upstream fix, 1.4.0 still affected)
+      - dependency-name: "node-forge"
+      # decode-uri-component: GHSA-vcc3-ghjq-m6fr (no safe 0.x release)
+      - dependency-name: "decode-uri-component"
